@@ -11,7 +11,8 @@ import { isMobile } from '../utils/utils';
 
 const DEFAULT_CHAT_ID = 0;
 
-const prefix = isMobile ? '/openapi' : '/api';
+// const prefix = isMobile ? '/openapi' : '/api';
+const prefix = isMobile ? '/api' : '/api';
 
 export function searchRecommend(
   queryText: string,

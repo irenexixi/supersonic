@@ -346,10 +346,12 @@ const ChatFooter: ForwardRefRenderFunction<any, Props> = (
             <div>智能助理</div>
           </div>
         )}
+        {!isMobile && (
         <div className={styles.toolItem} onClick={onOpenShowcase}>
           <IconFont type="icon-showcase" className={styles.toolIcon} />
           <div>showcase</div>
         </div>
+        )}
       </div>
       <div className={styles.composer}>
         <div className={styles.composerInputWrapper}>

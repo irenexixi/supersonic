@@ -33,7 +33,7 @@ body,
   font-family: var(--tencent-font-family);
   -webkit-font-smoothing:antialiased;
   margin: 0;
-  min-width: 1280px;
+  // min-width: 1280px;
   overflow-x: scroll;
 }
 
@@ -323,4 +323,18 @@ ol {
     }
   }
   }
+}
+
+// h5自定义样式或重写样式
+.ant-pro-global-header-collapsed-button,
+.ant-pro-global-header-right-content  {
+  display: none;
+}
+#root {
+  min-width: 100%;
+}
+:where(.css-dev-only-do-not-override-1k8up4j).ant-layout {
+  font-family: -apple-system,BlinkMacSystemFont,Helvetica Neue,Helvetica,Segoe UI,Arial,Roboto,PingFang SC,miui,Hiragino Sans GB,Microsoft Yahei,sans-serif;
+  line-height: 1.5;
+  color: #666666;
 }

@@ -5,6 +5,7 @@ import {
   DownloadOutlined,
   RedoOutlined,
   FileJpgOutlined,
+  SoundOutlined
 } from '@ant-design/icons';
 import { Button } from 'antd';
 import { CLS_PREFIX } from '../../common/constants';
@@ -22,6 +23,7 @@ type Props = {
   isSimpleMode?: boolean;
   onExportData?: () => void;
   onReExecute?: (queryId: number) => void;
+  // onReadRes?: () => void;
 };
 
 const Tools: React.FC<Props> = ({
@@ -32,6 +34,7 @@ const Tools: React.FC<Props> = ({
   isSimpleMode = false,
   onExportData,
   onReExecute,
+  // onReadRes
 }) => {
   const [score, setScore] = useState(scoreValue || 0);
   const [exportLoading, setExportLoading] = useState<boolean>(false);
@@ -58,7 +61,8 @@ const Tools: React.FC<Props> = ({
 
   return (
     <div className={prefixCls}>
-      {!isMobile && (
+      {/* !isMobile && */}
+      {(
         <div className={`${prefixCls}-feedback`}>
           {/* <div>这个回答正确吗？</div> */}
 
@@ -77,10 +81,27 @@ const Tools: React.FC<Props> = ({
                   type="text"
                   loading={exportLoading}
                 >
+                  <SoundOutlined />
+                  <span className={`${prefixCls}-font-style`}>语音播放</span>
+                </Button>
+                {!isMobile && (
+                <Button
+                  size="small"
+                  onClick={() => {
+                    setExportLoading(true);
+                    onExportData?.();
+                    setTimeout(() => {
+                      setExportLoading(false);
+                    }, 1000);
+                  }}
+                  type="text"
+                  loading={exportLoading}
+                >
                   <DownloadOutlined />
                   <span className={`${prefixCls}-font-style`}>导出数据</span>
                 </Button>
-                {!isSimpleMode && (
+                )}
+                {!isMobile && !isSimpleMode && (
                   <Button
                     size="small"
                     onClick={() => {
@@ -92,7 +113,7 @@ const Tools: React.FC<Props> = ({
                     <span className={`${prefixCls}-font-style`}>导出图片</span>
                   </Button>
                 )}
-                {isLastMessage && (
+                {!isMobile && isLastMessage && (
                   <Button
                     size="small"
                     onClick={() => {

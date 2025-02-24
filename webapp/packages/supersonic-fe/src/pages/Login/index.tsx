@@ -39,7 +39,7 @@ const LoginPage: React.FC = () => {
         }
         setInitialState({ ...initialState, currentUser, authCodes });
       }
-      history.push('/');
+      history.push('/webapp/chat');
       return;
     }
     message.success(msg);

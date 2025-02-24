@@ -326,6 +326,30 @@ ol {
 }
 
 // h5自定义样式或重写样式
+::-webkit-scrollbar-track-piece {
+  background-color: #fff;
+  -webkit-border-radius: 3px;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  height: 16px;
+  background-color: #9f9f9f;
+  -webkit-border-radius: 7px;
+  outline: 2px solid #fff;
+  outline-offset: -2px;
+  border: 2px solid #fff;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  height: 16px;
+  background-color: #9f9f9f;
+  -webkit-border-radius: 8px
+}
 .ant-pro-global-header-collapsed-button,
 .ant-pro-global-header-right-content  {
   display: none;
@@ -337,4 +361,7 @@ ol {
   font-family: -apple-system,BlinkMacSystemFont,Helvetica Neue,Helvetica,Segoe UI,Arial,Roboto,PingFang SC,miui,Hiragino Sans GB,Microsoft Yahei,sans-serif;
   line-height: 1.5;
   color: #666666;
+}
+:where(.css-dev-only-do-not-override-1f1bk24).ant-picker-dropdown .ant-picker-panel-container .ant-picker-panels {
+  flex-wrap: wrap;
 }

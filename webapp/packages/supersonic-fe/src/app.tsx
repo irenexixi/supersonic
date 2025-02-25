@@ -142,9 +142,10 @@ export const layout: RunTimeLayoutConfig = (params) => {
     childrenRender: (dom) => {
       return (
         <ConfigProvider theme={configProviderTheme}>
+          {/* height: location.pathname.includes('chat') ? 'calc(100vh - 56px)' : undefined, */}
           <div
             style={{
-              height: location.pathname.includes('chat') ? 'calc(100vh - 56px)' : undefined,
+              height: location.pathname.includes('chat') ? '100vh' : undefined,
             }}
           >
             <AppPage dom={dom} />

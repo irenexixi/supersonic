@@ -326,6 +326,24 @@ ol {
 }
 
 // h5自定义样式或重写样式
+::-webkit-scrollbar {
+  width: 5px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  height: 16px;
+  background-color: #ccc;
+  -webkit-border-radius: 7px;
+  // outline: 2px solid #fff;
+  // outline-offset: -2px;
+  // border: 2px solid #fff;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  height: 16px;
+  background-color: #ccc;
+  -webkit-border-radius: 8px
+}
 .ant-layout-header {
   display: none;
 }

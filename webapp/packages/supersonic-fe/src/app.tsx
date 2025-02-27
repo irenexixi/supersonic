@@ -15,6 +15,7 @@ export { request } from './services/request';
 import { BASE_TITLE } from '@/common/constants';
 import { ROUTE_AUTH_CODES } from '../config/routes';
 import AppPage from './pages/index';
+import { ELEPHANT_USERNAME_KEY, ELEPHANT_TOKEN_KEY, AUTH_TOKEN_KEY } from '@/common/constants';
 
 const replaceRoute = '/';
 
@@ -50,7 +51,14 @@ export async function getInitialState(): Promise<{
 }> {
   const fetchUserInfo = async () => {
     try {
-      const { code, data } = await queryCurrentUser();
+      // todo projectId可能是不需要的，先写死一个，以后再改
+      const projectId = '96';
+      const ELEPHANT_USERNAME = localStorage.getItem(ELEPHANT_USERNAME_KEY) || 'admin';
+      const ELEPHANT_TOKEN = localStorage.getItem(ELEPHANT_TOKEN_KEY) || 'token123';
+      if (!ELEPHANT_USERNAME || !ELEPHANT_TOKEN) {
+        return undefined;
+      }
+      const { code, data } = await queryCurrentUser(projectId, ELEPHANT_USERNAME, ELEPHANT_TOKEN);
       if (code === 200) {
         return { ...data, staffName: data.staffName || data.name };
       }
@@ -64,6 +72,7 @@ export async function getInitialState(): Promise<{
   }
 
   if (currentUser) {
+    localStorage.setItem(AUTH_TOKEN_KEY, currentUser.token);
     localStorage.setItem('user', currentUser.staffName);
     if (currentUser.orgName) {
       localStorage.setItem('organization', currentUser.orgName);

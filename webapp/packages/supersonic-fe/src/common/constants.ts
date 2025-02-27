@@ -1,5 +1,9 @@
 // 登陆 token key
 export const AUTH_TOKEN_KEY = process.env.APP_TARGET === 'inner' ? 'TME_TOKEN' : 'SUPERSONIC_TOKEN';
+// 分析云存的用户名的key
+export const ELEPHANT_USERNAME_KEY = 'oaAccount';
+// 分析云存的token的key
+export const ELEPHANT_TOKEN_KEY = 'token';
 // 记录上次访问页面
 export const FROM_URL_KEY = 'FROM_URL';
 

@@ -4,8 +4,19 @@ export async function query() {
   return request<API.CurrentUser[]>(`${process.env.API_BASE_URL}users`);
 }
 
-export async function queryCurrentUser() {
-  return request<Result<API.CurrentUser>>(`${process.env.AUTH_API_BASE_URL}user/getCurrentUser`);
+// export async function queryCurrentUser() {
+//   return request<Result<API.CurrentUser>>(`${process.env.AUTH_API_BASE_URL}user/getCurrentUser`);
+// }
+export async function queryCurrentUser(projectId: string, userName: string, token: string) {
+  console.log('123', userName)
+  return request(`${process.env.AUTH_API_BASE_URL}user/getCurrentUser`, {
+    method: 'get',
+    params: {
+      projectId,
+      userName,
+      token
+    }
+  });
 }
 
 export function getSystemConfig(): Promise<any> {

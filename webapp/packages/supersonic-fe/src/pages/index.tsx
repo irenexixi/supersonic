@@ -3,10 +3,11 @@ import { useLocation } from '@umijs/max';
 import NProgress from 'nprogress';
 import 'nprogress/nprogress.css';
 import { ELEPHANT_USERNAME_KEY } from '@/common/constants';
+import { isMobile } from '../utils/utils';
 
 // 默认设置为h5模式
 const rootELe = document.getElementById('root')
-if (rootELe) {
+if (rootELe && isMobile) {
   rootELe.classList.add('h5-mode')
 }
 // 直接使用当前页面的 URL
@@ -16,12 +17,7 @@ const oaAccount = url.searchParams?.get('oaAccount');
 if (oaAccount) {
   localStorage.setItem(ELEPHANT_USERNAME_KEY, oaAccount);
 }
-// 非h5模式去掉class
-const mode = url.searchParams?.get('mode');
-if (!mode && rootELe) {
-  rootELe.classList.remove('h5-mode')
-}
-console.log('mode', mode, '、oaAccount', oaAccount);
+console.log('isMobile', isMobile, '、oaAccount', oaAccount);
 
 NProgress.configure({ showSpinner: false });
 

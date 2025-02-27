@@ -344,27 +344,30 @@ ol {
   background-color: #ccc;
   -webkit-border-radius: 8px
 }
-.ant-layout-header {
-  display: none;
+.h5-mode {
+  .ant-layout-header {
+    display: none;
+  }
+  .ant-pro-global-header-collapsed-button,
+  .ant-pro-global-header-right-content  {
+    display: none;
+  }
+  #root {
+    min-width: 100%;
+  }
+  :where(.css-dev-only-do-not-override-1k8up4j).ant-layout {
+    font-family: -apple-system,BlinkMacSystemFont,Helvetica Neue,Helvetica,Segoe UI,Arial,Roboto,PingFang SC,miui,Hiragino Sans GB,Microsoft Yahei,sans-serif;
+    line-height: 1.5;
+    color: #666666;
+  }
+  :where(.css-dev-only-do-not-override-1f1bk24).ant-picker-dropdown .ant-picker-panel-container .ant-picker-panels {
+    flex-wrap: wrap;
+  }
+  // .ss-chat-item-step-icon {
+  //   display: none;
+  // }
+  // .ss-chat-item-parse-tip {
+    // display: none;
+  // }
 }
-.ant-pro-global-header-collapsed-button,
-.ant-pro-global-header-right-content  {
-  display: none;
-}
-#root {
-  min-width: 100%;
-}
-:where(.css-dev-only-do-not-override-1k8up4j).ant-layout {
-  font-family: -apple-system,BlinkMacSystemFont,Helvetica Neue,Helvetica,Segoe UI,Arial,Roboto,PingFang SC,miui,Hiragino Sans GB,Microsoft Yahei,sans-serif;
-  line-height: 1.5;
-  color: #666666;
-}
-:where(.css-dev-only-do-not-override-1f1bk24).ant-picker-dropdown .ant-picker-panel-container .ant-picker-panels {
-  flex-wrap: wrap;
-}
-// .ss-chat-item-step-icon {
-//   display: none;
-// }
-// .ss-chat-item-parse-tip {
-  // display: none;
-// }
+

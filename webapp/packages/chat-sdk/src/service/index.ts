@@ -1,4 +1,6 @@
 import axios from './axiosInstance';
+import { fetchEventSource } from '@microsoft/fetch-event-source';
+import { getToken } from '../utils/utils';
 import {
   ChatContextType,
   HistoryMsgItemType,
@@ -148,5 +150,32 @@ export function queryDimensionValues(
     agentId,
     elementID,
     value,
+  });
+}
+export function queryThoughtsInSSE(queryText: string, agentId: number | undefined, messageFunc: ((arg0: any) => void), errorFunc: ((arg0: any) => void) ) {
+  const ctrl = new AbortController();
+  return fetchEventSource(`${prefix}/chat/query/streamParse`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + getToken()
+    },
+    body: JSON.stringify({
+      queryText,
+      agentId,
+    }),
+    signal: ctrl.signal,
+    onopen: async (res) => {
+      if (res.ok) {
+        return;
+      } else {
+        ctrl.abort();
+      }
+    },
+    onmessage: messageFunc,
+    onerror: (error) => {
+      errorFunc(error)
+      ctrl.abort();
+    }
   });
 }

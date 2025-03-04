@@ -10,24 +10,25 @@ import {
   SimilarQuestionType,
 } from '../../common/type';
 import { createContext, useEffect, useRef, useState } from 'react';
-import { chatExecute, chatParse, queryData, deleteQuery, switchEntity } from '../../service';
+import { chatExecute, chatParse, queryData, deleteQuery, switchEntity,queryThoughtsInSSE,queryThoughts } from '../../service';
 import { PARSE_ERROR_TIP, PREFIX_CLS, SEARCH_EXCEPTION_TIP } from '../../common/constants';
 import { message, Spin } from 'antd';
-import IconFont from '../IconFont';
-import ExpandParseTip from './ExpandParseTip';
-import ParseTip from './ParseTip';
+// import IconFont from '../IconFont';
+// import ExpandParseTip from './ExpandParseTip';
+// import ParseTip from './ParseTip';
 import ExecuteItem from './ExecuteItem';
 import { isMobile } from '../../utils/utils';
 import classNames from 'classnames';
 import Tools from '../Tools';
-import SqlItem from './SqlItem';
-import SimilarQuestionItem from './SimilarQuestionItem';
+// import SqlItem from './SqlItem';
+// import SimilarQuestionItem from './SimilarQuestionItem';
 import { AgentType } from '../../Chat/type';
 import dayjs, { Dayjs } from 'dayjs';
 import { exportCsvFile } from '../../utils/utils';
-import { useMethodRegister } from '../../hooks';
+// import { useMethodRegister } from '../../hooks';
 
 type Props = {
+  msgId: string | number;
   msg: string;
   conversationId?: number;
   questionId?: number;
@@ -58,6 +59,7 @@ export const ChartItemContext = createContext({
 });
 
 const ChatItem: React.FC<Props> = ({
+  msgId,
   msg,
   conversationId,
   questionId,
@@ -70,12 +72,12 @@ const ChatItem: React.FC<Props> = ({
   parseTimeCostValue,
   msgData,
   isDeveloper,
-  integrateSystem,
+  // integrateSystem,
   executeItemNode,
   renderCustomExecuteNode,
   isSimpleMode,
   currentAgent,
-  isDebugMode,
+  // isDebugMode,
   isLastMessage,
   onMsgDataLoaded,
   onUpdateMessageScroll,
@@ -208,6 +210,22 @@ const ChatItem: React.FC<Props> = ({
   };
 
   const sendMsg = async () => {
+    const responseDiv = document.getElementById('thoughts-response-'+msgId)
+    if (responseDiv) {
+      responseDiv.textContent = ''
+      let time = 0;
+      const messageFunc = (event) => {
+        setTimeout(() => {
+          responseDiv.textContent += event.data
+          responseDiv.scrollTop = responseDiv.scrollHeight;
+        },time)
+        time += 500
+      }
+      const errorFunc = (error) => {
+          console.error('SSE 错误:', error);
+      };
+      queryThoughtsInSSE(msg,agentId,messageFunc,errorFunc)
+    }
     setParseLoading(true);
     const parseData: any = await chatParse({
       queryText: msg,
@@ -437,138 +455,139 @@ const ChatItem: React.FC<Props> = ({
     [`${prefixCls}-content-mobile`]: isMobile,
   });
 
-  const { llmReq, llmResp } = parseInfo?.properties?.CONTEXT || {};
+  // const { llmReq, llmResp } = parseInfo?.properties?.CONTEXT || {};
 
-  const { register, call } = useMethodRegister(() => message.error('该条消息暂不支持该操作'));
+  // const { register, call } = useMethodRegister(() => message.error('该条消息暂不支持该操作'));
 
   return (
-    <ChartItemContext.Provider value={{ register, call }}>
-      <div className={prefixCls}>
-        {!isMobile && <IconFont type="icon-zhinengsuanfa" className={`${prefixCls}-avatar`} />}
-        <div className={isMobile ? `${prefixCls}-mobile-msg-card` : ''}>
-          <div className={`${prefixCls}-time`}>
-            {parseTimeCost?.parseStartTime
-              ? dayjs(parseTimeCost.parseStartTime).format('M月D日 HH:mm')
-              : ''}
-          </div>
-          <div className={contentClass}>
-            <>
-              {currentAgent?.enableFeedback === 1 && !questionId && showExpandParseTip && (
-                <div style={{ marginBottom: 10 }}>
-                  <ExpandParseTip
-                    isSimpleMode={isSimpleMode}
-                    parseInfoOptions={preParseInfoOptions}
-                    agentId={agentId}
-                    integrateSystem={integrateSystem}
-                    parseTimeCost={parseTimeCost?.parseTime}
-                    isDeveloper={isDeveloper}
-                    onSelectParseInfo={onExpandSelectParseInfo}
-                    onSwitchEntity={onSwitchEntity}
-                    onFiltersChange={onFiltersChange}
-                    onDateInfoChange={onDateInfoChange}
-                    onRefresh={onRefresh}
-                    handlePresetClick={handlePresetClick}
-                  />
-                </div>
-              )}
+    // <ChartItemContext.Provider value={{ register, call }}>
 
-              {!preParseMode && (
-                <ParseTip
-                  isSimpleMode={isSimpleMode}
-                  parseLoading={parseLoading}
-                  parseInfoOptions={parseInfoOptions}
-                  parseTip={parseTip}
-                  currentParseInfo={parseInfo}
-                  agentId={agentId}
-                  dimensionFilters={dimensionFilters}
-                  dateInfo={dateInfo}
-                  entityInfo={entityInfo}
-                  integrateSystem={integrateSystem}
-                  parseTimeCost={parseTimeCost?.parseTime}
-                  isDeveloper={isDeveloper}
-                  onSelectParseInfo={onSelectParseInfo}
-                  onSwitchEntity={onSwitchEntity}
-                  onFiltersChange={onFiltersChange}
-                  onDateInfoChange={onDateInfoChange}
-                  onRefresh={() => {
-                    onRefresh();
-                  }}
-                  handlePresetClick={handlePresetClick}
-                />
-              )}
-            </>
-
-            {executeMode && (
-              <Spin spinning={entitySwitchLoading}>
-                <div style={{ minHeight: 50 }}>
-                  {!isMobile &&
-                    parseInfo?.sqlInfo &&
-                    isDeveloper &&
-                    isDebugMode &&
-                    !isSimpleMode && (
-                      <SqlItem
-                        agentId={agentId}
-                        queryId={parseInfo.queryId}
-                        question={msg}
-                        llmReq={llmReq}
-                        llmResp={llmResp}
-                        integrateSystem={integrateSystem}
-                        queryMode={parseInfo.queryMode}
-                        sqlInfo={parseInfo.sqlInfo}
-                        sqlTimeCost={parseTimeCost?.sqlTime}
-                        executeErrorMsg={executeErrorMsg}
-                      />
-                    )}
-                  <ExecuteItem
-                    isSimpleMode={isSimpleMode}
-                    queryId={parseInfo?.queryId}
-                    question={msg}
-                    queryMode={parseInfo?.queryMode}
-                    executeLoading={executeLoading}
-                    executeTip={executeTip}
-                    executeErrorMsg={executeErrorMsg}
-                    chartIndex={0}
-                    data={data}
-                    triggerResize={triggerResize}
-                    executeItemNode={executeItemNode}
-                    isDeveloper={isDeveloper}
-                    renderCustomExecuteNode={renderCustomExecuteNode}
-                  />
-                </div>
-              </Spin>
-            )}
-            {/* todo 注释 */}
-            {executeMode &&
-              !executeLoading &&
-              !isSimpleMode &&
-              parseInfo?.queryMode !== 'PLAIN_TEXT' && (
-                <SimilarQuestionItem
-                  queryId={parseInfo?.queryId}
-                  defaultExpanded={parseTip !== '' || executeTip !== ''}
-                  similarQueries={data?.similarQueries}
-                  onSelectQuestion={onSelectQuestion}
-                />
-              )}
-          </div>
-          {(parseTip !== '' || (executeMode && !executeLoading)) &&
-            parseInfo?.queryMode !== 'PLAIN_TEXT' && (
-              <Tools
-                isLastMessage={isLastMessage}
-                queryId={parseInfo?.queryId || 0}
-                scoreValue={score}
-                isParserError={isParserError}
-                onExportData={() => {
-                  onExportData();
-                }}
+    // </ChartItemContext.Provider>
+    <div className={prefixCls}>
+    {/* {!isMobile && <IconFont type="icon-zhinengsuanfa" className={`${prefixCls}-avatar`} />} */}
+    <div className={isMobile ? `${prefixCls}-mobile-msg-card` : ''}>
+      {/* <div className={`${prefixCls}-time`}>
+        {parseTimeCost?.parseStartTime
+          ? dayjs(parseTimeCost.parseStartTime).format('M月D日 HH:mm')
+          : ''}
+      </div> */}
+      <div className={contentClass}>
+        {/* <>
+          {currentAgent?.enableFeedback === 1 && !questionId && showExpandParseTip && (
+            <div style={{ marginBottom: 10 }}>
+              <ExpandParseTip
                 isSimpleMode={isSimpleMode}
-                onReExecute={queryId => {
-                  deleteQueryInfo(queryId);
-                }}
+                parseInfoOptions={preParseInfoOptions}
+                agentId={agentId}
+                integrateSystem={integrateSystem}
+                parseTimeCost={parseTimeCost?.parseTime}
+                isDeveloper={isDeveloper}
+                onSelectParseInfo={onExpandSelectParseInfo}
+                onSwitchEntity={onSwitchEntity}
+                onFiltersChange={onFiltersChange}
+                onDateInfoChange={onDateInfoChange}
+                onRefresh={onRefresh}
+                handlePresetClick={handlePresetClick}
               />
-            )}
-        </div>
+            </div>
+          )}
+
+          {!preParseMode && (
+            <ParseTip
+              isSimpleMode={isSimpleMode}
+              parseLoading={parseLoading}
+              parseInfoOptions={parseInfoOptions}
+              parseTip={parseTip}
+              currentParseInfo={parseInfo}
+              agentId={agentId}
+              dimensionFilters={dimensionFilters}
+              dateInfo={dateInfo}
+              entityInfo={entityInfo}
+              integrateSystem={integrateSystem}
+              parseTimeCost={parseTimeCost?.parseTime}
+              isDeveloper={isDeveloper}
+              onSelectParseInfo={onSelectParseInfo}
+              onSwitchEntity={onSwitchEntity}
+              onFiltersChange={onFiltersChange}
+              onDateInfoChange={onDateInfoChange}
+              onRefresh={() => {
+                onRefresh();
+              }}
+              handlePresetClick={handlePresetClick}
+            />
+          )}
+        </> */}
+        {/* todo 这里放思考过程 */}
+        <div id={'thoughts-response-' + msgId} className='thoughts-container'></div>
+        {executeMode && (
+          <Spin spinning={entitySwitchLoading}>
+            <div style={{ minHeight: 50 }}>
+              {/* {!isMobile &&
+                parseInfo?.sqlInfo &&
+                isDeveloper &&
+                isDebugMode &&
+                !isSimpleMode && (
+                  <SqlItem
+                    agentId={agentId}
+                    queryId={parseInfo.queryId}
+                    question={msg}
+                    llmReq={llmReq}
+                    llmResp={llmResp}
+                    integrateSystem={integrateSystem}
+                    queryMode={parseInfo.queryMode}
+                    sqlInfo={parseInfo.sqlInfo}
+                    sqlTimeCost={parseTimeCost?.sqlTime}
+                    executeErrorMsg={executeErrorMsg}
+                  />
+                )} */}
+              <ExecuteItem
+                isSimpleMode={isSimpleMode}
+                queryId={parseInfo?.queryId}
+                question={msg}
+                queryMode={parseInfo?.queryMode}
+                executeLoading={executeLoading}
+                executeTip={executeTip}
+                executeErrorMsg={executeErrorMsg}
+                chartIndex={0}
+                data={data}
+                triggerResize={triggerResize}
+                executeItemNode={executeItemNode}
+                isDeveloper={isDeveloper}
+                renderCustomExecuteNode={renderCustomExecuteNode}
+              />
+            </div>
+          </Spin>
+        )}
+        {/* {executeMode &&
+          !executeLoading &&
+          !isSimpleMode &&
+          parseInfo?.queryMode !== 'PLAIN_TEXT' && (
+            <SimilarQuestionItem
+              queryId={parseInfo?.queryId}
+              defaultExpanded={parseTip !== '' || executeTip !== ''}
+              similarQueries={data?.similarQueries}
+              onSelectQuestion={onSelectQuestion}
+            />
+          )} */}
       </div>
-    </ChartItemContext.Provider>
+      {(parseTip !== '' || (executeMode && !executeLoading)) &&
+        parseInfo?.queryMode !== 'PLAIN_TEXT' && (
+          <Tools
+            isLastMessage={isLastMessage}
+            queryId={parseInfo?.queryId || 0}
+            scoreValue={score}
+            isParserError={isParserError}
+            onExportData={() => {
+              onExportData();
+            }}
+            isSimpleMode={isSimpleMode}
+            onReExecute={queryId => {
+              deleteQueryInfo(queryId);
+            }}
+          />
+        )}
+    </div>
+  </div>
   );
 };
 

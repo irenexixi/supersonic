@@ -95,6 +95,7 @@ const MessageContainer: React.FC<Props> = ({
                   <Text position="right" data={msg} />
                   {identityMsg && <Text position="left" data={identityMsg} />}
                   <ChatItem
+                    msgId={msgId}
                     questionId={questionId}
                     currentAgent={currentAgent}
                     isSimpleMode={isSimpleMode}

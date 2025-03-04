@@ -108,7 +108,7 @@ const ExecuteItem: React.FC<Props> = ({
 
   return (
     <>
-      {!isSimpleMode && (
+      {/* {!isSimpleMode && (
         <div className={`${prefixCls}-title-bar`}>
           <CheckCircleFilled className={`${prefixCls}-step-icon`} />
           <div
@@ -136,23 +136,17 @@ const ExecuteItem: React.FC<Props> = ({
             </div>
           </div>
         </div>
-      )}
+      )} */}
 
       <div
-        className={`${prefixCls}-content-container ${
-          isSimpleMode ? `${prefixCls}-content-container-simple` : ''
-        }`}
-        style={{ borderLeft: queryMode === 'PLAIN_TEXT' ? 'none' : undefined }}
+        // className={`${prefixCls}-content-container ${
+        //   isSimpleMode ? `${prefixCls}-content-container-simple` : ''
+        // }`}
+        // style={{ borderLeft: queryMode === 'PLAIN_TEXT' ? 'none' : undefined }}
       >
         <Spin spinning={entitySwitchLoading}>
           {data.queryAuthorization?.message && (
             <div className={`${prefixCls}-auth-tip`}>提示：{data.queryAuthorization.message}</div>
-          )}
-          {data.textSummary && (
-            <p className={`${prefixCls}-step-title`}>
-              <span style={{ marginRight: 5 }}>总结:</span>
-              {data.textSummary}
-            </p>
           )}
 
           {renderCustomExecuteNode && executeItemNode ? (
@@ -172,6 +166,12 @@ const ExecuteItem: React.FC<Props> = ({
               triggerResize={triggerResize}
               onMsgContentTypeChange={setMsgContentType}
             />
+          )}
+          {data.textSummary && (
+            <p className={`${prefixCls}-step-title`}>
+              <span style={{ marginRight: 5 }}>总结:</span>
+              {data.textSummary}
+            </p>
           )}
         </Spin>
       </div>

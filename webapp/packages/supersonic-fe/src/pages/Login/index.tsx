@@ -39,7 +39,7 @@ const LoginPage: React.FC = () => {
         }
         setInitialState({ ...initialState, currentUser, authCodes });
       }
-      history.push('/webapp/chat');
+      history.push('/webapp/redsea/chat');
       return;
     }
     message.success(msg);

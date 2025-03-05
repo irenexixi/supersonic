@@ -9,7 +9,7 @@ import { SemanticTypeEnum, SEMANTIC_TYPE_MAP, HOLDER_TAG } from '../constants';
 import { AgentType, ModelType } from '../type';
 import { searchRecommend } from '../../service';
 import styles from './style.module.less';
-import { useComposing } from '../../hooks/useComposing';
+// import { useComposing } from '../../hooks/useComposing';
 
 type Props = {
   inputMsg: string;
@@ -214,10 +214,10 @@ const ChatFooter: ForwardRefRenderFunction<any, Props> = (
     }
   };
 
-  const autoCompleteDropdownClass = classNames(styles.autoCompleteDropdown, {
-    [styles.mobile]: isMobile,
-    [styles.modelOptions]: modelOptions.length > 0,
-  });
+  // const autoCompleteDropdownClass = classNames(styles.autoCompleteDropdown, {
+  //   [styles.mobile]: isMobile,
+  //   [styles.modelOptions]: modelOptions.length > 0,
+  // });
 
   const onSelect = (value: string) => {
     isSelect = true;
@@ -321,7 +321,7 @@ const ChatFooter: ForwardRefRenderFunction<any, Props> = (
     if (modelOptionNodes.length || associateOptionNodes.length) fixWidthBug();
   }, [modelOptionNodes.length, associateOptionNodes.length]);
 
-  const { isComposing } = useComposing(document.getElementById('chatInput'));
+  // const { isComposing } = useComposing(document.getElementById('chatInput'));
 
   return (
     <div className={chatFooterClass}>
@@ -359,11 +359,11 @@ const ChatFooter: ForwardRefRenderFunction<any, Props> = (
           <AutoComplete
             className={styles.composerInput}
             value={inputMsg}
-            onChange={(value: string) => {
-              onInputMsgChange(value);
-            }}
+            // onChange={(value: string) => {
+            //   onInputMsgChange(value);
+            // }}
             onSelect={onSelect}
-            autoFocus={true}
+            // autoFocus={true}
             ref={inputRef}
             id="chatInput"
             // onKeyDown={e => {
@@ -385,22 +385,30 @@ const ChatFooter: ForwardRefRenderFunction<any, Props> = (
             //     }
             //   }
             // }}
-            onFocus={() => {
-              setFocused(true);
-            }}
-            onBlur={() => {
-              setFocused(false);
-            }}
-            dropdownClassName={autoCompleteDropdownClass}
             listHeight={500}
             // allowClear
             open={open}
             defaultActiveFirstOption={false}
             getPopupContainer={triggerNode => triggerNode.parentNode}
           >
-            {modelOptions.length > 0 ? modelOptionNodes : associateOptionNodes?.length? associateOptionNodes : ''}
-            <TextArea autoSize={{minRows:1,maxRows:6}} placeholder={currentAgent ? '有什么问题尽管问我': '有什么问题尽管问我'}/>
+            {modelOptions.length > 0 ? modelOptionNodes : associateOptionNodes}
           </AutoComplete>
+          <TextArea
+            className='realInput'
+            onFocus={() => {
+              setFocused(true);
+            }}
+            onBlur={() => {
+              setFocused(false);
+            }}
+            autoFocus={true}             
+            value={inputMsg}
+            onChange={(e) => {
+              onInputMsgChange(e.target.value);
+            }}
+            autoSize={{minRows:1,maxRows:6}} 
+            placeholder={currentAgent ? '有什么问题尽管问我': '有什么问题尽管问我'}
+          />
           <div
             className={classNames(styles.sendBtn, {
               [styles.sendBtnActive]: inputMsg?.length > 0,

@@ -30,7 +30,6 @@
 
   .composer {
     display: flex;
-    height: 70px;
 
     .collapseBtn {
       height: 46px;
@@ -80,7 +79,6 @@
             resize: none;
 
             .ant-select-selection-search-input {
-              height: 40px !important;
               padding: 0 12px;
             }
 
@@ -146,14 +144,20 @@
     }
 
     .composer {
-      height: 40px;
+      max-height: 400px;
+      min-height: 44px;
       :global {
         .ant-select-selector {
           font-size: 14px !important;
         }
 
         .ant-select-selection-search-input {
-          padding: 0 10px !important;
+          box-sizing: border-box !important;
+          padding-right: 40px !important;
+          padding-left: 15px !important;
+          padding-top: 10px !important;
+          padding-bottom: 10px !important;
+          min-height: 36px !important;
         }
 
         .ant-select-selection-placeholder {

@@ -1,6 +1,6 @@
 import IconFont from '../../components/IconFont';
 import { getTextWidth, groupByColumn, isMobile } from '../../utils/utils';
-import { AutoComplete, Select, Tag } from 'antd';
+import { AutoComplete, Select, Tag, Input } from 'antd';
 import classNames from 'classnames';
 import { debounce } from 'lodash';
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
@@ -26,6 +26,7 @@ type Props = {
 };
 
 const { OptGroup, Option } = Select;
+const { TextArea } = Input;
 let isPinyin = false;
 let isSelect = false;
 
@@ -357,11 +358,6 @@ const ChatFooter: ForwardRefRenderFunction<any, Props> = (
         <div className={styles.composerInputWrapper}>
           <AutoComplete
             className={styles.composerInput}
-            placeholder={
-              currentAgent
-                ? '有什么问题尽管问我'
-                : '有什么问题尽管问我'
-            }
             value={inputMsg}
             onChange={(value: string) => {
               onInputMsgChange(value);
@@ -403,6 +399,7 @@ const ChatFooter: ForwardRefRenderFunction<any, Props> = (
             getPopupContainer={triggerNode => triggerNode.parentNode}
           >
             {modelOptions.length > 0 ? modelOptionNodes : associateOptionNodes}
+            <TextArea autoSize={{minRows:1,maxRows:6}} placeholder={currentAgent ? '有什么问题尽管问我': '有什么问题尽管问我'}/>
           </AutoComplete>
           <div
             className={classNames(styles.sendBtn, {

@@ -363,28 +363,28 @@ const ChatFooter: ForwardRefRenderFunction<any, Props> = (
               onInputMsgChange(value);
             }}
             onSelect={onSelect}
-            autoFocus={!isMobile}
+            autoFocus={true}
             ref={inputRef}
             id="chatInput"
-            onKeyDown={e => {
-              if (e.code === 'Enter' || e.code === 'NumpadEnter') {
-                const chatInputEl: any = document.getElementById('chatInput');
-                const agent = agentList.find(
-                  item => chatInputEl.value[0] === '/' && chatInputEl.value.includes(item.name)
-                );
-                if (agent) {
-                  if (agent.id !== currentAgent?.id) {
-                    onSelectAgent(agent);
-                  }
-                  onInputMsgChange('');
-                  return;
-                }
-                if (!isSelect && !isComposing) {
-                  sendMsg(chatInputEl.value);
-                  setOpen(false);
-                }
-              }
-            }}
+            // onKeyDown={e => {
+            //   if (e.code === 'Enter' || e.code === 'NumpadEnter') {
+            //     const chatInputEl: any = document.getElementById('chatInput');
+            //     const agent = agentList.find(
+            //       item => chatInputEl.value[0] === '/' && chatInputEl.value.includes(item.name)
+            //     );
+            //     if (agent) {
+            //       if (agent.id !== currentAgent?.id) {
+            //         onSelectAgent(agent);
+            //       }
+            //       onInputMsgChange('');
+            //       return;
+            //     }
+            //     if (!isSelect && !isComposing) {
+            //       sendMsg(chatInputEl.value);
+            //       setOpen(false);
+            //     }
+            //   }
+            // }}
             onFocus={() => {
               setFocused(true);
             }}
@@ -393,12 +393,12 @@ const ChatFooter: ForwardRefRenderFunction<any, Props> = (
             }}
             dropdownClassName={autoCompleteDropdownClass}
             listHeight={500}
-            allowClear
+            // allowClear
             open={open}
             defaultActiveFirstOption={false}
             getPopupContainer={triggerNode => triggerNode.parentNode}
           >
-            {modelOptions.length > 0 ? modelOptionNodes : associateOptionNodes}
+            {modelOptions.length > 0 ? modelOptionNodes : associateOptionNodes?.length? associateOptionNodes : ''}
             <TextArea autoSize={{minRows:1,maxRows:6}} placeholder={currentAgent ? '有什么问题尽管问我': '有什么问题尽管问我'}/>
           </AutoComplete>
           <div

@@ -387,6 +387,7 @@ const ChatFooter: ForwardRefRenderFunction<any, Props> = (
             // }}
             listHeight={500}
             // allowClear
+            placement="topLeft" 
             open={open}
             defaultActiveFirstOption={false}
             getPopupContainer={triggerNode => triggerNode.parentNode}

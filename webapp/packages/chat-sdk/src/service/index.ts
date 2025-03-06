@@ -152,7 +152,7 @@ export function queryDimensionValues(
     value,
   });
 }
-export function queryThoughtsInSSE(queryText: string, agentId: number | undefined, messageFunc: ((arg0: any) => void), errorFunc: ((arg0: any) => void) ) {
+export function queryThoughtsInSSE(queryText: string, agentId: number | undefined, messageFunc: ((arg0: any) => void), errorFunc: ((arg0: any) => void), closeFunc: (() => void) ) {
   const ctrl = new AbortController();
   return fetchEventSource(`${prefix}/chat/query/streamParse`, {
     method: 'POST',
@@ -175,6 +175,10 @@ export function queryThoughtsInSSE(queryText: string, agentId: number | undefine
     onmessage: messageFunc,
     onerror: (error) => {
       errorFunc(error)
+      ctrl.abort();
+    },
+    onclose: () => {
+      closeFunc()
       ctrl.abort();
     }
   });

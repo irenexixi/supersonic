@@ -9,10 +9,11 @@ import {
   RangeValue,
   SimilarQuestionType,
 } from '../../common/type';
-import { createContext, useEffect, useRef, useState } from 'react';
-import { chatExecute, chatParse, queryData, deleteQuery, switchEntity,queryThoughtsInSSE,queryThoughts } from '../../service';
+import { createContext, useEffect, useRef, useState, ReactNode } from 'react';
+import { chatExecute, chatParse, queryData, deleteQuery, switchEntity,queryThoughtsInSSE } from '../../service';
 import { PARSE_ERROR_TIP, PREFIX_CLS, SEARCH_EXCEPTION_TIP } from '../../common/constants';
 import { message, Spin } from 'antd';
+import { CheckCircleFilled } from '@ant-design/icons';
 // import IconFont from '../IconFont';
 // import ExpandParseTip from './ExpandParseTip';
 // import ParseTip from './ParseTip';
@@ -25,6 +26,7 @@ import Tools from '../Tools';
 import { AgentType } from '../../Chat/type';
 import dayjs, { Dayjs } from 'dayjs';
 import { exportCsvFile } from '../../utils/utils';
+import Loading from './Loading';
 // import { useMethodRegister } from '../../hooks';
 
 type Props = {
@@ -84,6 +86,7 @@ const ChatItem: React.FC<Props> = ({
   onSendMsg,
 }) => {
   const [parseLoading, setParseLoading] = useState(false);
+  const [isThinking, setIsThinking] = useState(false);
   const [parseTimeCost, setParseTimeCost] = useState<ParseTimeCostType>();
   const [parseInfo, setParseInfo] = useState<ChatContextType>();
   const [parseInfoOptions, setParseInfoOptions] = useState<ChatContextType[]>([]);
@@ -125,6 +128,21 @@ const ChatItem: React.FC<Props> = ({
   };
 
   const prefixCls = `${PREFIX_CLS}-item`;
+
+  const getNodeTip = (title: ReactNode, tip?: string | ReactNode) => {
+    return (
+      <>
+        <div className={`${prefixCls}-title-bar`}>
+          <CheckCircleFilled className={`${prefixCls}-step-icon`} />
+          <div className={`${prefixCls}-step-title`}>
+            {title}
+            {!tip && <Loading />}
+          </div>
+        </div>
+        {tip && <div className={`${prefixCls}-content-container`}>{tip}</div>}
+      </>
+    );
+  };
 
   const updateData = (res: Result<MsgDataType>) => {
     let tip: string = '';
@@ -213,18 +231,21 @@ const ChatItem: React.FC<Props> = ({
     const responseDiv = document.getElementById('thoughts-response-'+msgId)
     if (responseDiv) {
       responseDiv.textContent = ''
-      let time = 0;
       const messageFunc = (event) => {
-        setTimeout(() => {
-          responseDiv.textContent += event.data
-          responseDiv.scrollTop = responseDiv.scrollHeight;
-        },time)
-        time += 500
+        setIsThinking(false)
+        responseDiv.textContent += event.data
+        responseDiv.scrollTop = responseDiv.scrollHeight;
       }
       const errorFunc = (error) => {
+          setIsThinking(false)
           console.error('SSE 错误:', error);
       };
-      queryThoughtsInSSE(msg,agentId,messageFunc,errorFunc)
+      const closeFunc = () => {
+          setIsThinking(false)
+          console.log('SSE 连接已关闭');
+      };
+      setIsThinking(true)
+      queryThoughtsInSSE(msg,agentId,messageFunc,errorFunc,closeFunc)
     }
     setParseLoading(true);
     const parseData: any = await chatParse({
@@ -518,6 +539,7 @@ const ChatItem: React.FC<Props> = ({
           )}
         </> */}
         {/* todo 这里放思考过程 */}
+        {isThinking && getNodeTip('深度思考中')}
         <div id={'thoughts-response-' + msgId} className='thoughts-container'></div>
         {executeMode && (
           <Spin spinning={entitySwitchLoading}>

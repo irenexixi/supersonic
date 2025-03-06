@@ -55,8 +55,8 @@ export async function getInitialState(): Promise<{
     try {
       // todo projectId可能是不需要的，先写死一个，以后再改
       const projectId = '96';
-      const ELEPHANT_USERNAME = localStorage.getItem(ELEPHANT_USERNAME_KEY) || 'yangguang1wx';
-      const ELEPHANT_TOKEN = localStorage.getItem(ELEPHANT_TOKEN_KEY) || '846fce78486f41469eb2f0e7739d5948';
+      const ELEPHANT_USERNAME = localStorage.getItem(ELEPHANT_USERNAME_KEY);
+      const ELEPHANT_TOKEN = localStorage.getItem(ELEPHANT_TOKEN_KEY);
       if (!ELEPHANT_USERNAME || !ELEPHANT_TOKEN) {
         return undefined;
       }

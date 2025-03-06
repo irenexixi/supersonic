@@ -123,7 +123,7 @@ const ChatMsg: React.FC<Props> = ({
     const isMetricBar =
       categoryField?.length > 0 &&
       metricFields?.length === 1 &&
-      (isMobile ? dataSource?.length <= 5 : dataSource?.length <= 50);
+      (isMobile ? dataSource?.length <= 10 : dataSource?.length <= 50);
 
     if (isMetricBar) {
       return MsgContentTypeEnum.METRIC_BAR;

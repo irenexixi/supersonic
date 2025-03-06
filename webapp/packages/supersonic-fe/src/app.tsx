@@ -16,7 +16,9 @@ import { BASE_TITLE } from '@/common/constants';
 import { ROUTE_AUTH_CODES } from '../config/routes';
 import AppPage from './pages/index';
 import { ELEPHANT_USERNAME_KEY, ELEPHANT_TOKEN_KEY, AUTH_TOKEN_KEY } from '@/common/constants';
-
+setTimeout(() => {
+  window.document.title = `${BASE_TITLE}`;
+}, 1000);
 const replaceRoute = '/';
 
 const getRunningEnv = async () => {
@@ -53,8 +55,8 @@ export async function getInitialState(): Promise<{
     try {
       // todo projectId可能是不需要的，先写死一个，以后再改
       const projectId = '96';
-      const ELEPHANT_USERNAME = localStorage.getItem(ELEPHANT_USERNAME_KEY) || 'admin';
-      const ELEPHANT_TOKEN = localStorage.getItem(ELEPHANT_TOKEN_KEY) || 'token123';
+      const ELEPHANT_USERNAME = localStorage.getItem(ELEPHANT_USERNAME_KEY) || 'yangguang1wx';
+      const ELEPHANT_TOKEN = localStorage.getItem(ELEPHANT_TOKEN_KEY) || '846fce78486f41469eb2f0e7739d5948';
       if (!ELEPHANT_USERNAME || !ELEPHANT_TOKEN) {
         return undefined;
       }
@@ -119,7 +121,9 @@ export function onRouteChange() {
   setTimeout(() => {
     let title = window.document.title;
     if (!title.toLowerCase().endsWith(BASE_TITLE.toLowerCase())) {
-      window.document.title = `${title}-${BASE_TITLE}`;
+      // window.document.title = `${title}-${BASE_TITLE}`;
+      window.document.title = `${BASE_TITLE}`;
+      console.log('title', window.document.title);
     }
   }, 100);
 }
@@ -140,7 +144,7 @@ export const layout: RunTimeLayoutConfig = (params) => {
           style={{ display: 'inline-block', marginTop: 8 }}
         />
         <div className="logo" style={{ position: 'relative', top: '-2px' }}>
-          SuperSonic
+          红海ChatBI
         </div>
       </Space>
     ),

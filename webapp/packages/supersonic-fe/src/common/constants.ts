@@ -7,7 +7,8 @@ export const ELEPHANT_TOKEN_KEY = 'token';
 // 记录上次访问页面
 export const FROM_URL_KEY = 'FROM_URL';
 
-export const BASE_TITLE = 'Supersonic';
+// export const BASE_TITLE = 'Supersonic';
+export const BASE_TITLE = '红海ChatBI';
 
 export const PRIMARY_COLOR = '#f87653';
 export const CHART_BLUE_COLOR = '#446dff';

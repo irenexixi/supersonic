@@ -19,6 +19,27 @@ export function formatByDecimalPlaces(value: number | string, decimalPlaces: num
   return strValue;
 }
 
+export function formatByWanOrYi(value: number | string) {
+  if (value === null || value === undefined || value === '') {
+    return 0;
+  }
+  if (isNaN(+value)) {
+    return value;
+  }
+  const isNegative = +value < 0;
+  const absNum = Math.abs(+value);
+  let result;
+
+  if (absNum >= 1e8) {
+      result = (absNum / 1e8).toFixed(2) + '亿';
+  } else if (absNum >= 1e4) {
+      result = (absNum / 1e4).toFixed(2) + '万';
+  } else {
+      result = absNum.toString();
+  }
+
+  return isNegative ? `-${result}` : result;
+}
 export function formatByThousandSeperator(value: number | string) {
   if (value === null || value === undefined || value === '') {
     return 0;

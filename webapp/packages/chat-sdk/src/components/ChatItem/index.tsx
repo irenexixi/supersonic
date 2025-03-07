@@ -231,10 +231,14 @@ const ChatItem: React.FC<Props> = ({
     const responseDiv = document.getElementById('thoughts-response-'+msgId)
     if (responseDiv) {
       responseDiv.textContent = ''
+      let time = 0;
       const messageFunc = (event) => {
-        setIsThinking(false)
-        responseDiv.textContent += event.data
-        responseDiv.scrollTop = responseDiv.scrollHeight;
+        // setIsThinking(false)
+        setTimeout(() => {
+          responseDiv.textContent += event.data
+          responseDiv.scrollTop = responseDiv.scrollHeight;
+        },time)
+        time += 200
       }
       const errorFunc = (error) => {
           setIsThinking(false)

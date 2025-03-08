@@ -1,5 +1,5 @@
 import { PREFIX_CLS } from '../../../common/constants';
-import { formatByDecimalPlaces, formatMetric, formatNumberWithCN } from '../../../utils/utils';
+import { formatByDecimalPlaces, formatMetric, formatByWanOrYi } from '../../../utils/utils';
 import { AggregateInfoType, ColumnType } from '../../../common/type';
 import PeriodCompareItem from '../MetricCard/PeriodCompareItem';
 import { SwapOutlined } from '@ant-design/icons';
@@ -35,7 +35,7 @@ const MetricInfo: React.FC<Props> = ({ aggregateInfo, currentMetricField }) => {
                 )}${dataFormatType === 'percent' ? '%' : ''}`
               : isNumber
               ? formatMetric(value)
-              : formatNumberWithCN(+value)}
+              : formatByWanOrYi(+value)}
           </div>
           {!isNaN(+value) && +value >= 10000 && (
             <div className={`${prefixCls}-indicator-switch`}>

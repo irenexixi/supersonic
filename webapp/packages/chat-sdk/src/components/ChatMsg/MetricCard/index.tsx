@@ -1,5 +1,5 @@
 import { PREFIX_CLS } from '../../../common/constants';
-import { formatByDecimalPlaces, formatMetric, formatNumberWithCN } from '../../../utils/utils';
+import { formatByDecimalPlaces, formatMetric, formatByWanOrYi } from '../../../utils/utils';
 import ApplyAuth from '../ApplyAuth';
 import { MsgDataType } from '../../../common/type';
 import PeriodCompareItem from './PeriodCompareItem';
@@ -58,7 +58,7 @@ const MetricCard: React.FC<Props> = ({ data, question, loading, onApplyAuth }) =
                     )}${dataFormatType === 'percent' ? '%' : ''}`
                   : isNumber
                   ? formatMetric(value) || '-'
-                  : formatNumberWithCN(+value)}
+                  : formatByWanOrYi(+value)}
               </div>
               {!isNaN(+value) && +value >= 10000 && (
                 <div className={`${prefixCls}-indicator-switch`}>

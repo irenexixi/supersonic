@@ -141,6 +141,32 @@ const MetricTrendChart: React.FC<Props> = ({
       },
       tooltip: {
         trigger: 'axis',
+        position: function (point, params, dom, rect, size) {
+          const tooltipWidth = size.contentSize[0];
+          const viewportWidth = window.innerWidth;
+          let x = point[0];
+          // 水平方向判断
+          if (point[0]+46 - tooltipWidth < 0) {
+              // 左边超出视口，尝试放右边
+              const rightPos = point[0]+46 + tooltipWidth;
+              if (rightPos > viewportWidth) {
+                  // 右边也超出视口，试着贴着右边视口的
+                  x = point[0]+46 - tooltipWidth;
+              } else {
+                  x = point[0] + 10;
+              }
+          } else if (point[0]+46 + tooltipWidth > viewportWidth) {
+              // 右边超出视口，尝试放左边
+              const leftPos = point[0]+46 - tooltipWidth;
+              if (leftPos < 0) {
+                  // 左边也超出视口，试着贴着左边视口的
+                  x = 46;
+              } else {
+                  x = point[0] - tooltipWidth - 10;
+              }
+          }
+          return [x, point[1]];
+        },
         formatter: function (params: any[]) {
           const param = params[0];
           const valueLabels = params

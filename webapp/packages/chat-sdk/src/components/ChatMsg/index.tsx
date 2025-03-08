@@ -72,12 +72,6 @@ const ChatMsg: React.FC<Props> = ({
 
   const getMsgContentType = () => {
     const singleData = dataSource.length === 1;
-    // 这里前端写死看折线图效果，最终还是要后端解决出不了直线图的问题
-    columns?.forEach((item,index) => {
-      if(['日期','月份'].includes(item?.name)) {
-        columns[index].showType = 'DATE';
-      }
-    });
     const dateField = columns.find(item => item.showType === 'DATE' || item.type === 'DATE');
     const categoryField = columns.filter(item => item.showType === 'CATEGORY');
     const metricFields = columns.filter(item => item.showType === 'NUMBER');

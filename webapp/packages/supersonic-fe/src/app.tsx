@@ -62,6 +62,9 @@ export async function getInitialState(): Promise<{
       }
       const { code, data } = await queryCurrentUser(projectId, ELEPHANT_USERNAME, ELEPHANT_TOKEN);
       if (code === 200) {
+        setTimeout(() => {
+          history.push('/chat?agentId=43');
+        });
         return { ...data, staffName: data.staffName || data.name };
       }
     } catch (error) {}

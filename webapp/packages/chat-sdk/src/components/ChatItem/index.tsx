@@ -233,7 +233,6 @@ const ChatItem: React.FC<Props> = ({
       responseDiv.textContent = ''
       let time = 0;
       const messageFunc = (event) => {
-        // setIsThinking(false)
         setTimeout(() => {
           responseDiv.textContent += event.data
           responseDiv.scrollTop = responseDiv.scrollHeight;

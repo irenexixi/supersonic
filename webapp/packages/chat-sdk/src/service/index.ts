@@ -157,6 +157,7 @@ export function queryThoughtsInSSE(queryText: string, agentId: number | undefine
   return fetchEventSource(`${prefix}/chat/query/streamParse`, {
     method: 'POST',
     headers: {
+      'Cache-Control': 'no-cache',
       'Content-Type': 'application/json',
       'Authorization': 'Bearer ' + getToken()
     },
@@ -169,6 +170,7 @@ export function queryThoughtsInSSE(queryText: string, agentId: number | undefine
       if (res.ok) {
         return;
       } else {
+        errorFunc(new Error('连接不成功'))
         ctrl.abort();
       }
     },

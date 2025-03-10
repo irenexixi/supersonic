@@ -185,3 +185,17 @@ export function queryThoughtsInSSE(queryText: string, agentId: number | undefine
     }
   });
 }
+// 解析语音
+export function voiceIat(byteData: any) {
+  return axios.post<any>(`${prefix}/chat/voice/iat`, byteData, {
+    headers: {
+        // 'Content-Type': 'application/octet-stream'
+        // 'Content-Type': 'audio/wav',
+        'Content-Type': 'application/octet-stream'
+    }
+  })
+}
+// 文本转语音
+export function voiceTts(text: string) {
+  return axios.post<any>(`${prefix}/chat/voice/tts`, {text});
+}

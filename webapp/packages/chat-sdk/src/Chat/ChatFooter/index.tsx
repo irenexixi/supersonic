@@ -1,6 +1,6 @@
 import IconFont from '../../components/IconFont';
 import { getTextWidth, groupByColumn, isMobile } from '../../utils/utils';
-import { AutoComplete, Select, Tag, Input } from 'antd';
+import { AutoComplete, Select, Tag, Input, Button } from 'antd';
 import classNames from 'classnames';
 import { debounce } from 'lodash';
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
@@ -9,7 +9,9 @@ import { SemanticTypeEnum, SEMANTIC_TYPE_MAP, HOLDER_TAG } from '../constants';
 import { AgentType, ModelType } from '../type';
 import { searchRecommend } from '../../service';
 import styles from './style.module.less';
+import VoiceInput from './VoiceInput';
 // import { useComposing } from '../../hooks/useComposing';
+import { WifiOutlined, EditOutlined} from '@ant-design/icons';
 
 type Props = {
   inputMsg: string;
@@ -58,6 +60,7 @@ const ChatFooter: ForwardRefRenderFunction<any, Props> = (
   const [stepOptions, setStepOptions] = useState<Record<string, any[]>>({});
   const [open, setOpen] = useState(false);
   const [focused, setFocused] = useState(false);
+  const [showVoice, setShowVoice] = useState(false);
   const inputRef = useRef<any>();
   const fetchRef = useRef(0);
 
@@ -323,6 +326,24 @@ const ChatFooter: ForwardRefRenderFunction<any, Props> = (
 
   // const { isComposing } = useComposing(document.getElementById('chatInput'));
 
+  // const ButtonWithShortPress = () => {
+  //   const [pressStartTime, setPressStartTime] = useState(0);
+  //   const [showToast, setShowToast] = useState(false);
+  
+  //   // 记录按下时间
+  //   const handlePressStart = () => {
+  //     setPressStartTime(Date.now());
+  //   };
+  
+  //   // 计算持续时间并判断
+  //   const handlePressEnd = () => {
+  //     const duration = Date.now() - pressStartTime;
+  //     if (duration < 500) { // 阈值设为500ms
+  //       setShowToast(true);
+  //       setTimeout(() => setShowToast(false), 2000); // 2秒后隐藏提示
+  //     }
+  //   }
+  // }
   return (
     <div className={chatFooterClass}>
       <div className={styles.tools}>
@@ -354,7 +375,13 @@ const ChatFooter: ForwardRefRenderFunction<any, Props> = (
         </div>
         )}
       </div>
-      <div className={styles.composer}>
+      <div style={{ display: showVoice ? 'none' : 'flex' }} className={styles.composer}>
+        <div
+          className={styles.swtichInput}
+          onClick={() => setShowVoice(!showVoice)}>
+          {/* <IconFont type="icon-zhinengzhuli" className={styles.toolIcon} /> */}
+          <WifiOutlined className={styles.toolIcon} style={{transform: 'rotate(90deg)'}}/>
+        </div>
         <div className={styles.composerInputWrapper}>
           <AutoComplete
             className={styles.composerInput}
@@ -419,6 +446,19 @@ const ChatFooter: ForwardRefRenderFunction<any, Props> = (
             }}
           >
             <IconFont type="icon-ios-send" />
+          </div>
+        </div>
+      </div>
+      <div style={{ display: showVoice ? 'flex' : 'none' }} className={styles.composer}>
+        <div
+          className={styles.swtichInput}
+          onClick={() => setShowVoice(!showVoice)}>
+          {/* <IconFont type="icon-ios-send" className={styles.toolIcon} /> */}
+          <EditOutlined className={styles.toolIconx} />
+        </div>
+        <div className={styles.composerInputWrapper}>
+          <div className={styles.voiceInput}>
+            <VoiceInput></VoiceInput>
           </div>
         </div>
       </div>

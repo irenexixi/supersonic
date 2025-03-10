@@ -104,6 +104,7 @@ const ShowCase: React.FC<Props> = ({ height, agentId, onSendMsg }) => {
                           integrateSystem="showcase"
                           score={chatItem.score}
                           onSendMsg={onSendMsg}
+                          msgId={ undefined }
                         />
                       </div>
                     );

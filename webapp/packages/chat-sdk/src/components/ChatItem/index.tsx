@@ -30,7 +30,7 @@ import Loading from './Loading';
 // import { useMethodRegister } from '../../hooks';
 
 type Props = {
-  msgId: string | number;
+  msgId?: string | number;
   msg: string;
   conversationId?: number;
   questionId?: number;

@@ -107,7 +107,7 @@ const ChatItem: React.FC<Props> = ({
     {}
   );
   const [isParserError, setIsParseError] = useState<boolean>(false);
-
+  const isThinkingRef = useRef(isThinking);
   const resetState = () => {
     setParseLoading(false);
     setParseTimeCost(undefined);
@@ -240,12 +240,14 @@ const ChatItem: React.FC<Props> = ({
         time += 200
       }
       const errorFunc = (error) => {
-          setIsThinking(false)
-          console.error('SSE 错误:', error);
+        setIsThinking(false)
+        console.error('SSE 错误:', error);
       };
       const closeFunc = () => {
+        setTimeout(() => {
           setIsThinking(false)
-          console.log('SSE 连接已关闭');
+        },time)
+        console.log('SSE 连接已关闭');
       };
       setIsThinking(true)
       queryThoughtsInSSE(msg,agentId,messageFunc,errorFunc,closeFunc)
@@ -258,6 +260,24 @@ const ChatItem: React.FC<Props> = ({
       agentId,
       filters: filter,
     });
+    // 预设问题如果包含该提问，让其结果在思考后才出结果
+    if (currentAgent?.examples.includes(msg)) {
+      await new Promise(resolve => {
+        let step = 0
+        let timer = setInterval(() => {
+          step ++
+          if (!isThinkingRef.current) {
+            resolve(true)
+            clearInterval(timer)
+          } else {
+            if (step >= 50) {
+              resolve(true)
+              clearInterval(timer)
+            }
+          } 
+        }, 200)
+      });
+    }
     setParseLoading(false);
     const { code, data } = parseData || {};
     const { state, selectedParses, candidateParses, queryId, parseTimeCost, errorMsg } = data || {};

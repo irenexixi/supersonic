@@ -7,11 +7,12 @@ import {
   FileJpgOutlined,
   SoundOutlined
 } from '@ant-design/icons';
+import { MsgDataType } from '../../common/type';
 import { Button } from 'antd';
 import { CLS_PREFIX } from '../../common/constants';
 import { useContext, useState } from 'react';
 import classNames from 'classnames';
-import { updateQAFeedback } from '../../service';
+import { updateQAFeedback, voiceTts } from '../../service';
 import { useMethodRegister } from '../../hooks';
 import { ChartItemContext } from '../ChatItem';
 
@@ -21,6 +22,7 @@ type Props = {
   isLastMessage?: boolean;
   isParserError?: boolean;
   isSimpleMode?: boolean;
+  msgData?: MsgDataType;
   onExportData?: () => void;
   onReExecute?: (queryId: number) => void;
   // onReadRes?: () => void;
@@ -30,6 +32,7 @@ const Tools: React.FC<Props> = ({
   queryId,
   scoreValue,
   isLastMessage,
+  msgData,
   isParserError = false,
   isSimpleMode = false,
   onExportData,
@@ -58,6 +61,44 @@ const Tools: React.FC<Props> = ({
   });
 
   const { call } = useContext(ChartItemContext);
+  
+  const voiceReport = (msgData: any = {}) => {
+    console.log(msgData, msgData.textResult, msgData.textSummary);
+    let text = msgData.textResult;
+    if (msgData.textSummary) {
+        text = msgData.textResult + '总结：' + msgData.textSummary;
+    }
+    const times = text.length / 60 * 1000
+    setTimeout(() => {
+      setExportLoading(false);
+    }, times);
+    const audioElements = document.getElementsByClassName('voiceReportPlayer')[0];
+    if (audioElements) {
+      // @ts-ignore
+      audioElements.pause();
+    }
+    // @ts-ignore
+    voiceTts({ text }).then((res) => {
+      const audioElement = document.getElementsByClassName('voiceReportPlayer')[0];
+      if (audioElement) {
+        // @ts-ignore
+        audioElement.pause();
+        // @ts-ignore
+        audioElement.src = res
+        // @ts-ignore
+        audioElement.load()
+        // @ts-ignore
+        audioElement.play();
+        audioElement.addEventListener('ended', () => {
+          // @ts-ignore
+          URL.revokeObjectURL(res);
+        });
+      }
+    }).catch((err) => {
+      console.log('voiceReport', err);
+    });
+  }
+
 
   return (
     <div className={prefixCls}>
@@ -72,11 +113,12 @@ const Tools: React.FC<Props> = ({
                 <Button
                   size="small"
                   onClick={() => {
+                    voiceReport(msgData);
                     setExportLoading(true);
-                    onExportData?.();
-                    setTimeout(() => {
-                      setExportLoading(false);
-                    }, 1000);
+                    // // onExportData?.();
+                    // setTimeout(() => {
+                    //   setExportLoading(false);
+                    // }, 3000);
                   }}
                   type="text"
                   loading={exportLoading}

@@ -633,6 +633,7 @@ const ChatItem: React.FC<Props> = ({
             queryId={parseInfo?.queryId || 0}
             scoreValue={score}
             isParserError={isParserError}
+            msgData={msgData}
             onExportData={() => {
               onExportData();
             }}

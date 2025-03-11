@@ -28,7 +28,8 @@
     "remark-gfm": "^4.0.0",
     "sql-formatter": "^15.3.2",
     "tslib": "^2.5.2",
-    "js-audio-recorder": "^1.0.7"
+    "js-audio-recorder": "^1.0.7",
+    "umi-request": "1.4.0"
   },
   "peerDependencies": {
     "react": ">=16.8.0",

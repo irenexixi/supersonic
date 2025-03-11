@@ -8,6 +8,7 @@ import AgentTip from '../components/AgentTip';
 import classNames from 'classnames';
 import { MsgDataType } from '../../common/type';
 import ChatItem from '../../components/ChatItem';
+import { voiceTts } from '../../service';
 
 type Props = {
   id: string;
@@ -65,9 +66,41 @@ const MessageContainer: React.FC<Props> = ({
     onResize();
   }, [historyVisible, chatVisible]);
 
+  const voiceReport = (msgData: any) => {
+    console.log(msgData, msgData.textResult, msgData.textSummary);
+    const text = msgData.textResult + '总结：' + msgData.textSummary;
+    const audioElements = document.getElementsByClassName('voiceReportPlayer')[0];
+    if (audioElements) {
+      // @ts-ignore
+      audioElements.pause();
+    }
+    // @ts-ignore
+    voiceTts({ text }).then((res) => {
+      const audioElement = document.getElementsByClassName('voiceReportPlayer')[0];
+      if (audioElement) {
+        // @ts-ignore
+        audioElement.pause();
+        // @ts-ignore
+        audioElement.src = res
+        // @ts-ignore
+        audioElement.load()
+        // @ts-ignore
+        audioElement.play();
+        // 释放URL资源（在音频播放完毕后）
+        audioElement.addEventListener('ended', () => {
+          // @ts-ignore
+          URL.revokeObjectURL(res);
+        });
+      }
+    }).catch((err) => {
+      console.log('voiceReport', err);
+    });
+  }
+
   const messageContainerClass = classNames(styles.messageContainer, { [styles.mobile]: isMobile });
   return (
     <div id={id} className={messageContainerClass}>
+      <audio className="voiceReportPlayer" />
       <div className={styles.messageList}>
         {messageList.map((msgItem: MessageItem, index: number) => {
           const {
@@ -87,7 +120,7 @@ const MessageContainer: React.FC<Props> = ({
           } = msgItem;
 
           return (
-            <div key={msgId} id={`${msgId}`} className={styles.messageItem}>
+            <div key={msgId} id={`${msgId}`} className={styles.messageItem} onClick={() => voiceReport(msgData)}>
               {type === MessageTypeEnum.TEXT && <Text position="left" data={msg} />}
               {type === MessageTypeEnum.AGENT_LIST && (
                 <AgentTip currentAgent={currentAgent} onSendMsg={onSendMsg} id={msgId}/>

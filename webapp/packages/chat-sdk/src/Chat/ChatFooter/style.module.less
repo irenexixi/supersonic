@@ -10,6 +10,7 @@
     align-items: center;
     margin-bottom: 6px;
     column-gap: 8px;
+    margin-left: 10px;
 
     .toolItem {
       display: flex;
@@ -30,8 +31,9 @@
 
   .composer {
     display: flex;
-    height: 70px;
-
+    max-height: 400px;
+    min-height: 44px;
+    margin-bottom: 0;
     .collapseBtn {
       height: 46px;
       margin: 0 10px;
@@ -60,6 +62,7 @@
 
     .composerInputWrapper {
       position: relative;
+      flex: 1;
 
       .composerInput {
         width: 100%;
@@ -79,8 +82,12 @@
             resize: none;
 
             .ant-select-selection-search-input {
-              // height: 40px !important;
-              padding: 0 12px;
+              box-sizing: border-box !important;
+              padding-right: 40px !important;
+              padding-left: 15px !important;
+              padding-top: 10px !important;
+              padding-bottom: 10px !important;
+              min-height: 36px !important;
             }
 
             .ant-select-selection-search {
@@ -125,7 +132,7 @@
         -webkit-user-select: none; /* Chrome, Safari, Android */
         -moz-user-select: none;    /* Firefox */
         -ms-user-select: none;     /* IE10+/Edge */
-        user-select: none;         /* 标准语法 */
+        user-select: none;         /* 锟斤拷准锟斤法 */
       }
     }
   }
@@ -155,8 +162,7 @@
     margin: 6px 10px 10px;
     margin-left: 0;
     margin-right: 0;
-    // padding-bottom: 20px;
-    margin-bottom: 0px;
+    margin-bottom: 0;
 
     .addConversation {
       height: 40px;
@@ -164,11 +170,15 @@
     }
 
     .composer {
-      height: 60px;
-      position: relative;
-      padding: 5px 0;
+      max-height: 400px;
+      min-height: 44px;
+      display: flex;
       background: #fff;
-      width: 100%;
+      height: 64px;
+      padding: 5px 0;
+      .composerInput{
+        height: 0px;
+      }
       :global {
         .realInput {
           box-sizing: border-box !important;
@@ -183,7 +193,12 @@
         }
 
         .ant-select-selection-search-input {
-          padding: 0 10px !important;
+          box-sizing: border-box !important;
+          padding-right: 40px !important;
+          padding-left: 15px !important;
+          padding-top: 10px !important;
+          padding-bottom: 10px !important;
+          min-height: 36px !important;
         }
 
         .ant-select-selection-placeholder {
@@ -196,19 +211,19 @@
       .swtichInput {
         position: relative;
         margin: auto;
-        padding: 0 6px;
-        width: 42px;
+        padding: 0 8px;
+        width: 45px;
         >span {
           vertical-align: text-top;
           vertical-align: text-top;
-          border: solid 1px #bbb;
+          border: solid 1px #333;
           border-radius: 50%;
-          color: #bbb;
+          color: #333;
         }
         
         svg {
-          width: 28px;
-          height: 28px;
+          width: 24px;
+          height: 24px;
           transform: scale(0.7);
         }
       }
@@ -220,12 +235,11 @@
       padding-right: 10px;
       .composerInput {
         height: 100%;
-        width: 0;
         border: none;
         border-radius: 4px;
       }
       button {
-        height: 40px;
+        height: 44px;
         width: 100%;
       }
 

@@ -9,7 +9,7 @@ import { SemanticTypeEnum, SEMANTIC_TYPE_MAP, HOLDER_TAG } from '../constants';
 import { AgentType, ModelType } from '../type';
 import { searchRecommend } from '../../service';
 import styles from './style.module.less';
-import VoiceInput from './VoiceInput';
+import VoiceInput from './voiceInputBtn';
 // import { useComposing } from '../../hooks/useComposing';
 import { WifiOutlined, EditOutlined} from '@ant-design/icons';
 
@@ -326,24 +326,6 @@ const ChatFooter: ForwardRefRenderFunction<any, Props> = (
 
   // const { isComposing } = useComposing(document.getElementById('chatInput'));
 
-  // const ButtonWithShortPress = () => {
-  //   const [pressStartTime, setPressStartTime] = useState(0);
-  //   const [showToast, setShowToast] = useState(false);
-  
-  //   // 记录按下时间
-  //   const handlePressStart = () => {
-  //     setPressStartTime(Date.now());
-  //   };
-  
-  //   // 计算持续时间并判断
-  //   const handlePressEnd = () => {
-  //     const duration = Date.now() - pressStartTime;
-  //     if (duration < 500) { // 阈值设为500ms
-  //       setShowToast(true);
-  //       setTimeout(() => setShowToast(false), 2000); // 2秒后隐藏提示
-  //     }
-  //   }
-  // }
   return (
     <div className={chatFooterClass}>
       <div className={styles.tools}>

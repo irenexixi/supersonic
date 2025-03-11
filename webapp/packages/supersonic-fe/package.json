@@ -97,6 +97,7 @@
     "sql-formatter": "^15.3.2",
     "supersonic-chat-sdk": "workspace:*",
     "supersonic-insights-flow-components": "^1.4.9",
+    "js-audio-recorder": "^1.0.7",
     "umi-request": "1.4.0"
   },
   "devDependencies": {

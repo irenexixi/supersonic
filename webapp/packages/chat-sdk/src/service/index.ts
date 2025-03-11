@@ -1,3 +1,4 @@
+import request from 'umi-request';
 import axios from './axiosInstance';
 import { fetchEventSource } from '@microsoft/fetch-event-source';
 import { getToken } from '../utils/utils';
@@ -189,13 +190,17 @@ export function queryThoughtsInSSE(queryText: string, agentId: number | undefine
 export function voiceIat(byteData: any) {
   return axios.post<any>(`${prefix}/chat/voice/iat`, byteData, {
     headers: {
-        // 'Content-Type': 'application/octet-stream'
-        // 'Content-Type': 'audio/wav',
         'Content-Type': 'application/octet-stream'
     }
   })
 }
 // 文本转语音
-export function voiceTts(text: string) {
-  return axios.post<any>(`${prefix}/chat/voice/tts`, {text});
+export async function voiceTts(text: string) {
+  const response = await request.post(`${prefix}/chat/voice/tts`, {
+    responseType: 'blob',
+    data: text,
+  });
+  
+  const audioUrl = URL.createObjectURL(response);
+  return audioUrl
 }

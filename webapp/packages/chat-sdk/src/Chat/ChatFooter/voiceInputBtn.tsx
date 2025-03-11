@@ -200,7 +200,7 @@ const VoiceInput = () => {
 
    // 处理触摸事件冒泡到父元素时取消录音的情况
    const handleTouchCancelOutside = (e) => {
-    console.log('触摸事件冒泡到父元素handleTouchCancelOutsidehandleTouchCancelOutsidehandleTouchCancelOutsidehandleTouchCancelOutside', voiceTimeout.current)
+    // console.log('触摸事件冒泡到父元素handleTouchCancelOutsidehandleTouchCancelOutsidehandleTouchCancelOutsidehandleTouchCancelOutside', voiceTimeout.current)
     // @ts-ignore
     if (!buttonRef.current.contains(e.target)) {
       if (isRecording) {

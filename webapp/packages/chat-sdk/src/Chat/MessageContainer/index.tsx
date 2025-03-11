@@ -68,7 +68,7 @@ const MessageContainer: React.FC<Props> = ({
 
   const voiceReport = (msgData: any) => {
     console.log(msgData, msgData.textResult, msgData.textSummary);
-    const text = msgData.textResult + '×Ü½á£º' + msgData.textSummary;
+    const text = msgData.textResult + 'æ€»ç»“ï¼š' + msgData.textSummary;
     const audioElements = document.getElementsByClassName('voiceReportPlayer')[0];
     if (audioElements) {
       // @ts-ignore
@@ -86,7 +86,6 @@ const MessageContainer: React.FC<Props> = ({
         audioElement.load()
         // @ts-ignore
         audioElement.play();
-        // ÊÍ·ÅURL×ÊÔ´£¨ÔÚÒôÆµ²¥·ÅÍê±Ïºó£©
         audioElement.addEventListener('ended', () => {
           // @ts-ignore
           URL.revokeObjectURL(res);

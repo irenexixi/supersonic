@@ -444,7 +444,7 @@ const ChatFooter: ForwardRefRenderFunction<any, Props> = (
         </div>
         <div className={styles.composerInputWrapper}>
           <div className={styles.voiceInput}>
-            <VoiceInput></VoiceInput>
+            <VoiceInput onCallback={ onSendMsg }></VoiceInput>
           </div>
         </div>
       </div>

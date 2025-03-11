@@ -4,7 +4,7 @@ import Recorder from 'js-audio-recorder';
 import { voiceIat } from '../../service';
 
 // let voiceTimeout = null
-const VoiceInput = () => {
+const VoiceInput = ({ onCallback }) => {
   const [isRecording, setIsRecording] = useState(false);
   const voiceTimeout = useRef(null)
   const buttonRef = useRef(null);
@@ -74,7 +74,7 @@ const VoiceInput = () => {
       return true
     } catch (error) {
       console.error('无法获取麦克风权限1', error)
-      alertFlag && alert('无法获取麦克风权限1')
+      alertFlag && alert('无法获取麦克风权限')
       return false
     }
   }
@@ -103,7 +103,7 @@ const VoiceInput = () => {
               recorderFn.audioPlay(recorder)
               recorder.destroy()
             }
-        }, 50000)
+        }, 120000)
     } else if (isMediaSupport === false) {
         const res = await getMediaStream(flag)
         // @ts-ignore
@@ -132,7 +132,7 @@ const VoiceInput = () => {
 
   // 长按开始录音
   const handleTouchStart = useCallback((e) => {
-    console.log('下压触发onTouchStartonTouchStartonTouchStartonTouchStartonTouchStartonTouchStartonTouchStart', voiceTimeout.current)
+    // console.log('下压触发onTouchStartonTouchStartonTouchStartonTouchStartonTouchStartonTouchStartonTouchStart', voiceTimeout.current)
     // @ts-ignore
     clearTimeout(voiceTimeout.current);
     // @ts-ignore
@@ -140,7 +140,7 @@ const VoiceInput = () => {
     // // @ts-ignore
     const timeoutId = setTimeout(() => {
       startRecording();
-      console.log('执行录音setVoiceTimeoutsetVoiceTimeoutsetVoiceTimeoutsetVoiceTimeoutsetVoiceTimeoutsetVoiceTimeout', voiceTimeout.current)
+      // console.log('执行录音setVoiceTimeoutsetVoiceTimeoutsetVoiceTimeoutsetVoiceTimeoutsetVoiceTimeoutsetVoiceTimeout', voiceTimeout.current)
     }, 100)
     // @ts-ignore
     voiceTimeout.current = timeoutId
@@ -191,9 +191,16 @@ const VoiceInput = () => {
       // @ts-ignore
       if (res.code && res.code === 200) {
         console.log('voiceIat', res)
-        alert(`录音流程完成！！！将要自动发送请求。后续需要处理,录音文本为“${res.data}”,“”内看不到内容表示未能识别语音`)
+        if (!res.data) {
+          // onCallback && onCallback('今天天气咋样')
+          console.log(`未识别到内容，请重新录制`)
+        } else {
+          console.log(`录音流程完成！！！将要自动发送请求。后续需要处理,录音文本为“${res.data}”,若“”内看不到内容表示未能识别语音`)
+          // onSendMsg(value.trim(), option?.dataSetId);
+          onCallback && onCallback(res.data)
+        }
       } else {
-        alert('语音接口返回异常')
+        console.log(`语音接口返回异常`)
       }
     });
   }, []);
@@ -215,9 +222,16 @@ const VoiceInput = () => {
           // @ts-ignore
           if (res.code && res.code === 200) {
             console.log('voiceIat', res)
-            alert(`录音流程完成！！！将要自动发送请求。后续需要处理,录音文本为“${res.data}”,“”内看不到内容表示未能识别语音`)
+            if (!res.data) {
+              // onCallback && onCallback('今天天气咋样')
+              console.log(`未识别到内容，请重新录制`)
+            } else {
+              console.log(`录音流程完成！！！将要自动发送请求。后续需要处理,录音文本为“${res.data}”,若“”内看不到内容表示未能识别语音`)
+              // onSendMsg(value.trim(), option?.dataSetId);
+              onCallback && onCallback(res.data)
+            }
           } else {
-            alert('语音接口返回异常')
+            console.log(`语音接口返回异常`)
           }
         });
       }

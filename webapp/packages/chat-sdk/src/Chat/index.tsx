@@ -196,6 +196,7 @@ const Chat: ForwardRefRenderFunction<any, Props> = (
       },
     ]);
   };
+
   const appentHelloRep = (msgList: MessageItem[]) => {
     if (noInput) {
       setMessageList(msgList)
@@ -210,6 +211,16 @@ const Chat: ForwardRefRenderFunction<any, Props> = (
       ]);
     }
   };
+
+  const pushHelloRep = () => {
+    setMessageList(prev => {
+      return [...prev,{
+        id: uuid()+'-CouldNotAnswer',
+        type: MessageTypeEnum.AGENT_LIST,
+        msg: currentAgent?.name || agentList?.[0]?.name,
+      }]
+    })
+  }
 
   const convertHistoryMsg = (list: HistoryMsgItemType[]) => {
     return list.map((item: HistoryMsgItemType) => ({
@@ -456,6 +467,7 @@ const Chat: ForwardRefRenderFunction<any, Props> = (
                     integrateSystem={integrateSystem}
                     onMsgDataLoaded={onMsgDataLoaded}
                     onSendMsg={onSendMsg}
+                    onCouldNotAnswer={pushHelloRep}
                   />
                   {!noInput && (
                     <ChatFooter

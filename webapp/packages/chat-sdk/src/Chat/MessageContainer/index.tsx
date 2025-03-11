@@ -28,6 +28,7 @@ type Props = {
     isRefresh?: boolean
   ) => void;
   onSendMsg: (value: string) => void;
+  onCouldNotAnswer: () => void;
 };
 
 const MessageContainer: React.FC<Props> = ({
@@ -43,6 +44,7 @@ const MessageContainer: React.FC<Props> = ({
   isDebugMode,
   onMsgDataLoaded,
   onSendMsg,
+  onCouldNotAnswer
 }) => {
   const [triggerResize, setTriggerResize] = useState(false);
   const onResize = useCallback(() => {
@@ -88,7 +90,7 @@ const MessageContainer: React.FC<Props> = ({
             <div key={msgId} id={`${msgId}`} className={styles.messageItem}>
               {type === MessageTypeEnum.TEXT && <Text position="left" data={msg} />}
               {type === MessageTypeEnum.AGENT_LIST && (
-                <AgentTip currentAgent={currentAgent} onSendMsg={onSendMsg} />
+                <AgentTip currentAgent={currentAgent} onSendMsg={onSendMsg} id={msgId}/>
               )}
               {type === MessageTypeEnum.QUESTION && (
                 <>
@@ -117,6 +119,7 @@ const MessageContainer: React.FC<Props> = ({
                     }}
                     onUpdateMessageScroll={updateMessageContainerScroll}
                     onSendMsg={onSendMsg}
+                    onCouldNotAnswer={onCouldNotAnswer}
                     isLastMessage={index === messageList.length - 1}
                   />
                 </>

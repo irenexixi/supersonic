@@ -53,6 +53,7 @@ type Props = {
   onMsgDataLoaded?: (data: MsgDataType, valid: boolean, isRefresh?: boolean) => void;
   onUpdateMessageScroll?: () => void;
   onSendMsg?: (msg: string) => void;
+  onCouldNotAnswer?: () => void;
 };
 
 export const ChartItemContext = createContext({
@@ -61,7 +62,7 @@ export const ChartItemContext = createContext({
 });
 
 const ChatItem: React.FC<Props> = ({
-  msgId,
+  msgId = '',
   msg,
   conversationId,
   questionId,
@@ -84,6 +85,7 @@ const ChatItem: React.FC<Props> = ({
   onMsgDataLoaded,
   onUpdateMessageScroll,
   onSendMsg,
+  onCouldNotAnswer = () => {},
 }) => {
   const [parseLoading, setParseLoading] = useState(false);
   const [isThinking, setIsThinking] = useState(false);
@@ -201,7 +203,13 @@ const ChatItem: React.FC<Props> = ({
         valid,
         isRefresh
       );
+      // 没有回答上会显示一遍推荐问题
+      if(res?.data?.chatContext?.sqlInfo?.resultType === 'text') {
+        onCouldNotAnswer()
+      }
     } catch (e) {
+      console.log(e)
+      onCouldNotAnswer()
       const tip = SEARCH_EXCEPTION_TIP;
       setExecuteTip(SEARCH_EXCEPTION_TIP);
       setDataCache({ ...dataCache, [parseInfoValue!.id!]: { tip } });
@@ -242,14 +250,17 @@ const ChatItem: React.FC<Props> = ({
       const errorFunc = (error) => {
         setIsThinking(false)
         console.error('SSE 错误:', error);
+        throw error
       };
       const closeFunc = () => {
         setTimeout(() => {
           setIsThinking(false)
+          console.log(2, new Date())
         },time)
         console.log('SSE 连接已关闭');
       };
       setIsThinking(true)
+      console.log(1, new Date())
       queryThoughtsInSSE(msg,agentId,messageFunc,errorFunc,closeFunc)
     }
     setParseLoading(true);
@@ -261,12 +272,16 @@ const ChatItem: React.FC<Props> = ({
       filters: filter,
     });
     // 预设问题如果包含该提问，让其结果在思考后才出结果
+    console.log(currentAgent?.examples, msg, currentAgent?.examples.includes(msg))
     if (currentAgent?.examples.includes(msg)) {
       await new Promise(resolve => {
         let step = 0
         let timer = setInterval(() => {
           step ++
           if (!isThinkingRef.current) {
+            //此时思考中应该消失
+            console.log(isThinkingRef.current, '消失了吗？')
+            console.log(4, new Date())
             resolve(true)
             clearInterval(timer)
           } else {
@@ -342,6 +357,9 @@ const ChatItem: React.FC<Props> = ({
     }
     initChatItem(msg, msgData);
   }, [msg, msgData]);
+  useEffect(() => {
+    isThinkingRef.current = isThinking;
+  }, [isThinking]);
 
   const onSwitchEntity = async (entityId: string) => {
     setEntitySwitchLoading(true);

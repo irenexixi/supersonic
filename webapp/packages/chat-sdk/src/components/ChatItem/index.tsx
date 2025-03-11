@@ -208,7 +208,6 @@ const ChatItem: React.FC<Props> = ({
         onCouldNotAnswer()
       }
     } catch (e) {
-      console.log(e)
       onCouldNotAnswer()
       const tip = SEARCH_EXCEPTION_TIP;
       setExecuteTip(SEARCH_EXCEPTION_TIP);
@@ -255,12 +254,10 @@ const ChatItem: React.FC<Props> = ({
       const closeFunc = () => {
         setTimeout(() => {
           setIsThinking(false)
-          console.log(2, new Date())
         },time)
         console.log('SSE 连接已关闭');
       };
       setIsThinking(true)
-      console.log(1, new Date())
       queryThoughtsInSSE(msg,agentId,messageFunc,errorFunc,closeFunc)
     }
     setParseLoading(true);
@@ -272,16 +269,12 @@ const ChatItem: React.FC<Props> = ({
       filters: filter,
     });
     // 预设问题如果包含该提问，让其结果在思考后才出结果
-    console.log(currentAgent?.examples, msg, currentAgent?.examples.includes(msg))
     if (currentAgent?.examples.includes(msg)) {
       await new Promise(resolve => {
         let step = 0
         let timer = setInterval(() => {
           step ++
           if (!isThinkingRef.current) {
-            //此时思考中应该消失
-            console.log(isThinkingRef.current, '消失了吗？')
-            console.log(4, new Date())
             resolve(true)
             clearInterval(timer)
           } else {

@@ -16,7 +16,17 @@ type Props = {
 
 const Table: React.FC<Props> = ({ data, size, loading, question, onApplyAuth }) => {
   const { entityInfo, queryColumns, queryResults } = data;
-
+  /* 这里为了手机号码占比问题，写得非常死，看以后能不能优化----start */
+  queryResults.forEach((item,index) => {
+    if(item?.['指标']?.includes('占比')){
+      if((''+item['指标值']).endsWith('%')){
+        return
+      }else{
+        queryResults[index]['指标值'] = queryResults[index]['指标值'] + '%';
+      }
+    }
+  });
+  /* 这里为了手机号码占比问题，写得非常死，看以后能不能优化----end */
   const prefixCls = `${CLS_PREFIX}-table`;
   const tableColumns: any[] = queryColumns.map(
     ({ name, bizName, showType, dataFormatType, dataFormat, authorized }) => {

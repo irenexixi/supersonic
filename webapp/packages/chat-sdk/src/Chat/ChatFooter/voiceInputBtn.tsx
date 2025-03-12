@@ -162,8 +162,8 @@ const VoiceInput = ({ onCallback }) => {
         return;
       const touchX = e.touches[0]?.clientX;
       const touchY = e.touches[0]?.clientY;
-      console.log('touchXtouchY', touchX, touchY)
-      console.log('touchXtouchY', targetRect.left, targetRect.right, targetRect.top, targetRect.bottom)
+      // console.log('touchXtouchY', touchX, touchY)
+      // console.log('touchXtouchY', targetRect.left, targetRect.right, targetRect.top, targetRect.bottom)
       if (
         (touchX > targetRect.left && touchX < targetRect.right) &&
         (touchY > targetRect.top && touchY < targetRect.bottom)
@@ -192,6 +192,7 @@ const VoiceInput = ({ onCallback }) => {
     requestAnimationFrame(async () => {
       if (cancelRequest.current) {
         cancelRequest.current = false
+        recorder.destroy()
         return
       }
       const blobs = recorder.getWAVBlob()
@@ -312,12 +313,7 @@ const VoiceInput = ({ onCallback }) => {
             />
           )}
       </Button>
-        {!isRecording && (<a
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
-          onTouchCancel={handleTouchEnd}
-          style={{fontWeight: 'bold', color: '#333', zIndex: 1, userSelect: 'none', width: '130px', top: '12px', position: 'absolute', left: '130px'}}>请按住说话</a>)}
+        {!isRecording && (<a style={{fontWeight: 'bold', color: '#333', zIndex: 1, userSelect: 'none', width: '130px', top: '12px', position: 'absolute', left: '130px'}}>请按住说话</a>)}
     </div>
   );
 };

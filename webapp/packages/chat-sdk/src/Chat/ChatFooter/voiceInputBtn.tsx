@@ -2,12 +2,15 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Button, Image } from 'antd';
 import Recorder from 'js-audio-recorder';
 import { voiceIat } from '../../service';
+import { CloseOutlined } from '@ant-design/icons';
 
 // let voiceTimeout = null
 const VoiceInput = ({ onCallback }) => {
   const [isRecording, setIsRecording] = useState(false);
   const voiceTimeout = useRef(null)
   const buttonRef = useRef(null);
+  const cancelRef = useRef<HTMLDivElement>(null);
+  const cancelRequest = useRef(false);
 
   
   const recorderFn = {
@@ -132,7 +135,7 @@ const VoiceInput = ({ onCallback }) => {
 
   // 长按开始录音
   const handleTouchStart = useCallback((e) => {
-    // console.log('下压触发onTouchStartonTouchStartonTouchStartonTouchStartonTouchStartonTouchStartonTouchStart', voiceTimeout.current)
+    console.log('下压触发onTouchStartonTouchStartonTouchStartonTouchStartonTouchStartonTouchStartonTouchStart', voiceTimeout.current)
     // @ts-ignore
     clearTimeout(voiceTimeout.current);
     // @ts-ignore
@@ -153,22 +156,25 @@ const VoiceInput = ({ onCallback }) => {
     // stopRecording()
     // 检查是否移动到指定DOM（这里以按钮外部为例）
     // @ts-ignore
-    const targetRect = buttonRef.current.getBoundingClientRect();
-    if (!e.touches[0])
-      return;
-    const touchX = e.touches[0]?.clientX;
-    const touchY = e.touches[0]?.clientY;
-    if (
-      touchX < (targetRect.left - 200) ||
-      touchX > (targetRect.right + 200) ||
-      touchY < (targetRect.top - 200) ||
-      touchY > (targetRect.bottom + 200)
-    ) {
-      console.log('按压移动触发handleTouchMovehandleTouchMovehandleTouchMovehandleTouchMovehandleTouchMovehandleTouchMove', voiceTimeout.current)
-      // @ts-ignore
-      clearTimeout(voiceTimeout.current);
-      stopRecording(); // 移动到按钮外部+100距离，取消录音
-      // 移动到按钮外部+100距离，取消录音，不发送请求
+    if (cancelRef && cancelRef.current) {
+      const targetRect = cancelRef?.current?.getBoundingClientRect();
+      if (!e.touches[0])
+        return;
+      const touchX = e.touches[0]?.clientX;
+      const touchY = e.touches[0]?.clientY;
+      // console.log('touchXtouchY', touchX, touchY)
+      // console.log('touchXtouchY', targetRect.left, targetRect.right, targetRect.top, targetRect.bottom)
+      if (
+        (touchX > targetRect.left && touchX < targetRect.right) &&
+        (touchY > targetRect.top && touchY < targetRect.bottom)
+      ) {
+        console.log('按压移动触发handleTouchMovehandleTouchMovehandleTouchMovehandleTouchMovehandleTouchMovehandleTouchMove', voiceTimeout.current)
+        cancelRequest.current = true
+        // @ts-ignore
+        clearTimeout(voiceTimeout.current);
+        stopRecording();
+        // 移动到按钮外部+100距离，取消录音，不发送请求
+      }
     }
   }, []);
   // 长按结束取消录音
@@ -184,6 +190,11 @@ const VoiceInput = ({ onCallback }) => {
     // const formData = new FormData();
     // formData.append('audio', recorder.getWAVBlob(), 'recording.wav');
     requestAnimationFrame(async () => {
+      if (cancelRequest.current) {
+        cancelRequest.current = false
+        recorder.destroy()
+        return
+      }
       const blobs = recorder.getWAVBlob()
       if (blobs.size === 44) return
       const res = await voiceIat(blobs);
@@ -207,7 +218,7 @@ const VoiceInput = ({ onCallback }) => {
 
    // 处理触摸事件冒泡到父元素时取消录音的情况
    const handleTouchCancelOutside = (e) => {
-    // console.log('触摸事件冒泡到父元素handleTouchCancelOutsidehandleTouchCancelOutsidehandleTouchCancelOutsidehandleTouchCancelOutside', voiceTimeout.current)
+    // console.log('触摸事件冒泡到父元素handleToucdhCancelOutsdide', voiceTimeout.current)
     // @ts-ignore
     if (!buttonRef.current.contains(e.target)) {
       if (isRecording) {
@@ -249,27 +260,61 @@ const VoiceInput = ({ onCallback }) => {
   }, []);
 
   return (
-    <Button
-      ref={buttonRef}
-      className="voiceBtn"
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
-      onTouchCancel={handleTouchEnd}
-      type={isRecording ? 'primary' : 'default'}
-      block
-    >
-      {!isRecording && ( <span style={{fontWeight: 'bold', color: '#333'}}> 请按住说话 </span>)}
-      {isRecording && (
-        <Image
-            height={40}
-            width={140}
-            preview={false}
-            style={{filter: 'invert(100%)'}}
-            src={require('../../assets/icon/recording.gif')}
-          />
-        )}
-    </Button>
+    <div style={{position: 'relative'}}>
+      {isRecording && ( 
+        <div
+          className="btn-touch"
+          style={{position: 'absolute', bottom: '40px', right: 0, width: '100vw', height: '150px',
+            backgroundImage: 'linear-gradient(0deg, #FFFFFF 0%, rgba(249,252,255,0.80) 100%)'}}
+        >
+          <div
+            ref={cancelRef}
+            style={{
+              background: 'rgba(80,141,248,0.10)', border: '1px solid #C4DAF7', width: '60px', textAlign: 'center',
+              height: '60px', borderRadius: '50%', position: 'relative', margin: 'auto', top: '40px',
+            }}
+          >
+            {
+              <CloseOutlined style={{color: '#508DF8', fontSize: '22px', padding: '4px 0'}} />
+            }
+            {
+              <div style={{color: '#508DF8', fontSize: '18px'}}>
+                取消
+              </div>
+            }
+          </div>
+          <div style={{
+              position: 'absolute', bottom: '10px', textAlign: 'center', width: '100vw', color: '#666'
+            }}
+          >
+            松手发送问题，上滑至按钮取消发送
+          </div>
+        </div>
+      )}
+      <Button
+        ref={buttonRef}
+        className="voiceBtn"
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        onTouchCancel={handleTouchEnd}
+        type={isRecording ? 'primary' : 'default'}
+        style={{zIndex: '100', position: 'relative', background: isRecording ? '#446dff' : 'rgba(0,0,0,0)'}}
+        block
+      >
+        {/* {!isRecording && ('请按住说话')} */}
+        {isRecording && (
+          <Image
+              height={40}
+              width={140}
+              preview={false}
+              style={{filter: 'invert(100%)'}}
+              src={require('../../assets/icon/recording.gif')}
+            />
+          )}
+      </Button>
+        {!isRecording && (<a style={{fontWeight: 'bold', color: '#333', zIndex: 1, userSelect: 'none', width: '130px', top: '12px', position: 'absolute', left: '130px'}}>请按住说话</a>)}
+    </div>
   );
 };
 

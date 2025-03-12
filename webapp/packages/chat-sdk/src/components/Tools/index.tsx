@@ -10,7 +10,7 @@ import {
 import { MsgDataType } from '../../common/type';
 import { Button } from 'antd';
 import { CLS_PREFIX } from '../../common/constants';
-import { useContext, useState } from 'react';
+import { useContext, useState, useRef } from 'react';
 import classNames from 'classnames';
 import { updateQAFeedback, voiceTts } from '../../service';
 import { useMethodRegister } from '../../hooks';
@@ -62,7 +62,22 @@ const Tools: React.FC<Props> = ({
 
   const { call } = useContext(ChartItemContext);
   
+  const voiceData = useRef('')
+
   const voiceReport = (msgData: any = {}) => {
+    const audioElements = document.getElementsByClassName('voiceReportPlayer')[0];
+    if (voiceData.current) {
+      setExportLoading(false);
+      // @ts-ignore
+      if (audioElements.paused) {
+        // @ts-ignore
+        audioElements.play()
+      } else {
+        // @ts-ignore
+        audioElements.pause();
+      }
+      return
+    }
     console.log(msgData, msgData.textResult, msgData.textSummary);
     let text = msgData.textResult;
     if (msgData.textSummary) {
@@ -72,13 +87,13 @@ const Tools: React.FC<Props> = ({
     setTimeout(() => {
       setExportLoading(false);
     }, times);
-    const audioElements = document.getElementsByClassName('voiceReportPlayer')[0];
     if (audioElements) {
       // @ts-ignore
       audioElements.pause();
     }
     // @ts-ignore
     voiceTts({ text }).then((res) => {
+      voiceData.current = res
       const audioElement = document.getElementsByClassName('voiceReportPlayer')[0];
       if (audioElement) {
         // @ts-ignore
@@ -91,7 +106,7 @@ const Tools: React.FC<Props> = ({
         audioElement.play();
         audioElement.addEventListener('ended', () => {
           // @ts-ignore
-          URL.revokeObjectURL(res);
+          // URL.revokeObjectURL(res);
         });
       }
     }).catch((err) => {
@@ -113,8 +128,8 @@ const Tools: React.FC<Props> = ({
                 <Button
                   size="small"
                   onClick={() => {
-                    voiceReport(msgData);
                     setExportLoading(true);
+                    voiceReport(msgData);
                     // // onExportData?.();
                     // setTimeout(() => {
                     //   setExportLoading(false);
@@ -124,7 +139,8 @@ const Tools: React.FC<Props> = ({
                   loading={exportLoading}
                 >
                   <SoundOutlined />
-                  <span className={`${prefixCls}-font-style`}>语音播放</span>
+                  {/* <span className={`${prefixCls}-font-style`}>语音播放</span> */}
+                  <span className={`${prefixCls}-font-style`}></span>
                 </Button>
                 {!isMobile && (
                 <Button

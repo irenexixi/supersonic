@@ -11,7 +11,7 @@ import { searchRecommend } from '../../service';
 import styles from './style.module.less';
 import VoiceInput from './voiceInputBtn';
 // import { useComposing } from '../../hooks/useComposing';
-import { WifiOutlined, EditOutlined} from '@ant-design/icons';
+// import { WifiOutlined, EditOutlined} from '@ant-design/icons';
 
 type Props = {
   inputMsg: string;
@@ -447,7 +447,7 @@ const ChatFooter: ForwardRefRenderFunction<any, Props> = (
           className={styles.swtichInput}
           onClick={() => setShowVoice(!showVoice)}>
           {/* <IconFont type="icon-ios-send" className={styles.toolIcon} /> */}
-          {/* <EditOutlined className={styles.toolIconx} /> */}
+          {/* <EditOutlined className={styles.toolIcon} /> */}
           <Image
             className={styles.toolIcon} 
             width={26}

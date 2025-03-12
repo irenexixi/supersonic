@@ -31,6 +31,7 @@
 
   .composer {
     display: flex;
+    align-items: flex-end;
     max-height: 400px;
     min-height: 44px;
     margin-bottom: 0;
@@ -66,7 +67,7 @@
 
       .composerInput {
         width: 100%;
-        height: 0px;
+        height: 0px !important;
         :global {
           .ant-select-selector {
             box-sizing: border-box;
@@ -174,10 +175,9 @@
       min-height: 44px;
       display: flex;
       background: #fff;
-      height: 64px;
       padding: 5px 0;
       .composerInput{
-        height: 0px;
+        height: 0px !important;
       }
       :global {
         .realInput {
@@ -209,9 +209,7 @@
       }
     
       .swtichInput {
-        position: relative;
-        margin: auto;
-        padding: 0 8px;
+        padding: 8px 8px;
         width: 45px;
         >span {
           vertical-align: text-top;
@@ -229,7 +227,6 @@
       }
     }
     .composerInputWrapper {
-      height: 0;
       margin: 5px 0;
       width: calc(100% - 40px);
       padding-right: 10px;
@@ -246,7 +243,7 @@
     }
     .sendBtn {
       right: 20px;
-      top: 9px;
+      bottom: 8px;
       width: 26px;
       height: 26px;
     }

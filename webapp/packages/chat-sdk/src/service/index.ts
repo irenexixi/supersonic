@@ -204,3 +204,20 @@ export async function voiceTts(text: string) {
   const audioUrl = URL.createObjectURL(response);
   return audioUrl
 }
+
+export function dataInterpret(
+  textResult: string,
+  queryText: string,
+  chatId: number,
+  parseInfo: ChatContextType,
+  agentId?: number,
+) {
+  return axios.post<MsgDataType>(`${prefix}/chat/query/dataInterpret`, {
+    textResult,
+    queryText,
+    agentId,
+    chatId: chatId || DEFAULT_CHAT_ID,
+    queryId: parseInfo.queryId,
+    parseId: parseInfo.id,
+  });
+}

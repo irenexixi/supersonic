@@ -10,7 +10,7 @@ import {
   SimilarQuestionType,
 } from '../../common/type';
 import { createContext, useEffect, useRef, useState, ReactNode } from 'react';
-import { chatExecute, chatParse, queryData, deleteQuery, switchEntity,queryThoughtsInSSE } from '../../service';
+import { chatExecute, dataInterpret, chatParse, queryData, deleteQuery, switchEntity,queryThoughtsInSSE } from '../../service';
 import { PARSE_ERROR_TIP, PREFIX_CLS, SEARCH_EXCEPTION_TIP } from '../../common/constants';
 import { message, Spin } from 'antd';
 import { CheckCircleFilled } from '@ant-design/icons';
@@ -193,6 +193,10 @@ const ChatItem: React.FC<Props> = ({
     }
     try {
       const res: any = await chatExecute(msg, conversationId!, parseInfoValue, agentId);
+      const resOfSummary:any = await dataInterpret(res?.data?.textResult || '' ,msg, conversationId!, parseInfoValue, agentId)
+      if(res?.data){
+        res.data.textSummary = resOfSummary?.data?.textSummary
+      }
       const valid = updateData(res);
       onMsgDataLoaded?.(
         {

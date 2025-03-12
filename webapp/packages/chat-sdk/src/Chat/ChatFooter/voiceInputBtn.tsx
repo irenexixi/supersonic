@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { Button } from 'antd';
+import { Button, Image } from 'antd';
 import Recorder from 'js-audio-recorder';
 import { voiceIat } from '../../service';
 
@@ -256,10 +256,19 @@ const VoiceInput = ({ onCallback }) => {
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
       onTouchCancel={handleTouchEnd}
-      type="primary"
+      type={isRecording ? 'primary' : 'default'}
       block
     >
-      {isRecording ? '录音中...' : '按住 说话'}
+      {!isRecording && ( <span style={{fontWeight: 'bold', color: '#333'}}> 请按住说话 </span>)}
+      {isRecording && (
+        <Image
+            height={40}
+            width={140}
+            preview={false}
+            style={{filter: 'invert(100%)'}}
+            src={require('../../assets/icon/recording.gif')}
+          />
+        )}
     </Button>
   );
 };

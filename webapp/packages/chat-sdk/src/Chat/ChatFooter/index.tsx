@@ -1,6 +1,6 @@
 import IconFont from '../../components/IconFont';
 import { getTextWidth, groupByColumn, isMobile } from '../../utils/utils';
-import { AutoComplete, Select, Tag, Input, Button } from 'antd';
+import { AutoComplete, Select, Tag, Input, Button, Image } from 'antd';
 import classNames from 'classnames';
 import { debounce } from 'lodash';
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
@@ -366,7 +366,14 @@ const ChatFooter: ForwardRefRenderFunction<any, Props> = (
           className={styles.swtichInput}
           onClick={() => setShowVoice(!showVoice)}>
           {/* <IconFont type="icon-zhinengzhuli" className={styles.toolIcon} /> */}
-          <WifiOutlined className={styles.toolIcon} style={{transform: 'rotate(90deg)'}}/>
+          {/* <WifiOutlined className={styles.toolIcon} style={{transform: 'rotate(90deg)'}}/> */}
+          <Image
+            className={styles.toolIcon} 
+            width={26}
+            height={26}
+            preview={false}
+            src={require('../../assets/icon/voice@2x.png')}
+          />
         </div>
         <div className={styles.composerInputWrapper}>
           <AutoComplete
@@ -440,7 +447,14 @@ const ChatFooter: ForwardRefRenderFunction<any, Props> = (
           className={styles.swtichInput}
           onClick={() => setShowVoice(!showVoice)}>
           {/* <IconFont type="icon-ios-send" className={styles.toolIcon} /> */}
-          <EditOutlined className={styles.toolIconx} />
+          {/* <EditOutlined className={styles.toolIconx} /> */}
+          <Image
+            className={styles.toolIcon} 
+            width={26}
+            height={26}
+            preview={false}
+            src={require('../../assets/icon/keyboard@2x.png')}
+          />
         </div>
         <div className={styles.composerInputWrapper}>
           <div className={styles.voiceInput}>

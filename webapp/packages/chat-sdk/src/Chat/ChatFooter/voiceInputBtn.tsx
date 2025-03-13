@@ -135,6 +135,7 @@ const VoiceInput = ({ onCallback }) => {
 
   // 长按开始录音
   const handleTouchStart = useCallback((e) => {
+    event.preventDefault()
     // 录音时暂停所有播放
     const audioElementAll = document.getElementsByClassName(`voiceReportPlayer`);
     for (let i = 0; i < audioElementAll.length; i++) {
@@ -157,6 +158,7 @@ const VoiceInput = ({ onCallback }) => {
   
   // 移动取消录音
   const handleTouchMove = useCallback((e) => {
+    event.preventDefault()
     // @ts-ignore
     // clearTimeout(voiceTimeout.current);
     // stopRecording()
@@ -266,11 +268,12 @@ const VoiceInput = ({ onCallback }) => {
   }, []);
 
   return (
-    <div style={{position: 'relative'}}>
+    <div style={{position: 'relative', height: '44px'}}>
       {isRecording && ( 
         <div
           className="btn-touch"
           style={{position: 'absolute', bottom: '40px', right: 0, width: '100vw', height: '150px',
+            WebkitUserSelect: 'none', msUserSelect: 'none', MozUserSelect: 'none',userSelect: 'none',
             backgroundImage: 'linear-gradient(0deg, #FFFFFF 0%, rgba(249,252,255,0.80) 100%)'}}
         >
           <div

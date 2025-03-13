@@ -74,7 +74,7 @@ const Tools: React.FC<Props> = ({
       }
     }
     // 再次点击且已经请求数据就缓存播放
-    if (voiceData.current && `A${msgData.queryId}A` === voiceData.current) {
+    if (voiceData.current && `A${msgData.queryId}A` === voiceData.current && audioElements) {
       setExportLoading(false);
       // @ts-ignore
       if (audioElements.paused) {
@@ -87,9 +87,10 @@ const Tools: React.FC<Props> = ({
       return
     }
     console.log(msgData, msgData.textResult, msgData.textSummary);
+    // 只读总结
     let text = msgData.textResult;
     if (msgData.textSummary) {
-        text = msgData.textResult + '总结：' + msgData.textSummary;
+        text = '总结：' + msgData.textSummary;
     }
     const times = text.length / 60 * 1000
     setTimeout(() => {

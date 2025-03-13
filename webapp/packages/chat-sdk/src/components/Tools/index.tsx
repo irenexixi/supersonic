@@ -65,68 +65,80 @@ const Tools: React.FC<Props> = ({
   const voiceData = useRef('')
 
   const voiceReport = (msgData: any = {}) => {
-    const audioElementAll = document.getElementsByClassName(`voiceReportPlayer`);
-    const audioElements = document.getElementsByClassName(`voicePlayer${msgData.queryId}`)[0];
-    for (let i = 0; i < audioElementAll.length; i++) {
-      if (audioElementAll[i] !== audioElements) {
-        // @ts-ignore
-          audioElementAll[i].pause()
-      }
+    let audioCreate = document.getElementsByClassName(`voicePlayer${msgData.queryId}`)[0];
+    if (!audioCreate) {
+      const audioCreate = document.createElement('audio');
+      audioCreate.className = `voiceReportPlayer voicePlayer${msgData.queryId}`;
+      audioCreate.style.width = '0';
+      audioCreate.style.height = '0';
+      audioCreate.style.position = 'absolute';
+      const parentDiv = document.getElementsByClassName('anticon-sound')[0]
+      parentDiv.appendChild(audioCreate);
     }
-    // 再次点击且已经请求数据就缓存播放
-    if (voiceData.current && `A${msgData.queryId}A` === voiceData.current && audioElements) {
-      setExportLoading(false);
-      // @ts-ignore
-      if (audioElements.paused) {
-        // @ts-ignore
-        audioElements.play()
-      } else {
-        // @ts-ignore
-        audioElements.pause();
-      }
-      return
-    }
-    console.log(msgData, msgData.textResult, msgData.textSummary);
-    // 只读总结
-    let text = msgData.textResult;
-    if (msgData.textSummary) {
-        text = '总结：' + msgData.textSummary;
-    }
-    // const times = text.length / 30 * 1000
-    // setTimeout(() => {
-    //   setExportLoading(false);
-    // }, times);
-    if (audioElements) {
-      // @ts-ignore
-      audioElements.pause();
-    }
-    // @ts-ignore
-    voiceTts({ text }).then((res) => {
-      setExportLoading(false);
-      // @ts-ignore
-      voiceData.current = `A${msgData.queryId}A`
-      const audioElement = document.getElementsByClassName(`voicePlayer${msgData.queryId}`)[0];
-      // @ts-ignore
-      if (audioElement) {
-      // @ts-ignore
-        // audioElement.src = 'http://downsc.chinaz.net/files/download/sound1/201206/1638.mp3'
-        // @ts-ignore
-        audioElement.pause();
-        // @ts-ignore
-        audioElement.src = res
-        // @ts-ignore
-        audioElement.load()
-        // @ts-ignore
-        audioElement.play();
-        audioElement.addEventListener('ended', () => {
+   
+    requestAnimationFrame( () => {
+      const audioElementAll = document.getElementsByClassName(`voiceReportPlayer`);
+      for (let i = 0; i < audioElementAll.length; i++) {
+        if (audioElementAll[i] !== audioCreate) {
           // @ts-ignore
-          // URL.revokeObjectURL(res);
-        });
+            audioElementAll[i].pause()
+        }
       }
-    }).catch((err) => {
-      setExportLoading(false);
-      console.log('voiceReport', err);
-    });
+      // 再次点击且已经请求数据就缓存播放
+      if (voiceData.current && `A${msgData.queryId}A` === voiceData.current && audioCreate) {
+        setExportLoading(false);
+        // @ts-ignore
+        if (audioCreate.paused) {
+          // @ts-ignore
+          audioCreate.play()
+        } else {
+          // @ts-ignore
+          audioCreate.pause();
+        }
+        return
+      }
+      console.log(msgData, msgData.textResult, msgData.textSummary);
+      // 只读总结
+      let text = msgData.textResult;
+      if (msgData.textSummary) {
+          text = '总结：' + msgData.textSummary;
+      }
+      if (audioCreate) {
+        // @ts-ignore
+        audioCreate.pause();
+      }
+      if (!text) {
+        console.log('语音播报失败', '返回的文本数据缺失');
+        return;
+      }
+      // @ts-ignore
+      voiceTts({ text }).then((res) => {
+        setExportLoading(false);
+        // @ts-ignore
+        voiceData.current = `A${msgData.queryId}A`
+        const audioElement = document.getElementsByClassName(`voicePlayer${msgData.queryId}`)[0];
+        // @ts-ignore
+        if (audioElement) {
+        // @ts-ignore
+          // audioElement.src = 'http://downsc.chinaz.net/files/download/sound1/201206/1638.mp3'
+          // @ts-ignore
+          audioElement.pause();
+          // @ts-ignore
+          audioElement.src = res
+          // @ts-ignore
+          audioElement.load()
+          // @ts-ignore
+          audioElement.play();
+          audioElement.addEventListener('ended', () => {
+            // @ts-ignore
+            // URL.revokeObjectURL(res);
+          });
+        }
+      }).catch((err) => {
+        setExportLoading(false);
+        console.log('voiceReport', err);
+      });
+    })
   }
 
 

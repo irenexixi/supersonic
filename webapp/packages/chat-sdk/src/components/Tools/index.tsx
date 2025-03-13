@@ -106,7 +106,10 @@ const Tools: React.FC<Props> = ({
       // @ts-ignore
       voiceData.current = `A${msgData.queryId}A`
       const audioElement = document.getElementsByClassName(`voicePlayer${msgData.queryId}`)[0];
+      // @ts-ignore
       if (audioElement) {
+      // @ts-ignore
+        // audioElement.src = 'http://downsc.chinaz.net/files/download/sound1/201206/1638.mp3'
         // @ts-ignore
         audioElement.pause();
         // @ts-ignore
@@ -135,7 +138,7 @@ const Tools: React.FC<Props> = ({
           {/* <div>这个回答正确吗？</div> */}
 
           <div className={`${prefixCls}-feedback-left`}>
-            {!isParserError && (
+            {(!isParserError && msgData?.queryId) && (
               <>
                 <Button
                   size="small"

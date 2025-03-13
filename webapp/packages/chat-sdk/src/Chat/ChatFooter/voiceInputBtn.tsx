@@ -12,7 +12,8 @@ const VoiceInput = ({ onCallback }) => {
   const cancelRef = useRef<HTMLDivElement>(null);
   const cancelRequest = useRef(false);
 
-  
+
+
   const recorderFn = {
     isIE: () => { // ie?
         // @ts-ignore
@@ -37,6 +38,7 @@ const VoiceInput = ({ onCallback }) => {
     },
     audioStop: (recorder) => {
         recorder.stop()
+        recorder.destroy()
     },
     audioLength: (recorder) => {
         // console.log('LengthLengthLengthLengthLengthLength', recorder)
@@ -44,17 +46,12 @@ const VoiceInput = ({ onCallback }) => {
           if (`${params.duration}`.includes('4.0') || `${params.duration}`.includes('1.0') || `${params.duration}`.includes('2.0') || `${params.duration}`.includes('3.0')) {
             console.log(' recorder.onprogress', params)
           }
-            // const id = document.getElementById("len")
-            // id.innerHTML = "录音时长：" + params.duration.toFixed(2)
-            // const idx = document.getElementById("loud")
-            // idx.innerHTML = "音量大小：" + params.vol.toFixed(0) + "%"
         }
     },
     audioPlay: (recorder) => {
         // const blob = recorder.getWAVBlob()
         // const url = URL.createObjectURL(blob)
         // const audio = new Audio(url)
-        
         // document.getElementById('audioPlayer').src = url
         recorder.play()
     },
@@ -67,6 +64,14 @@ const VoiceInput = ({ onCallback }) => {
   let isMediaSupport = undefined
   let recorder = new Recorder()
   
+  // 监听myVariable的变化
+  useEffect(() => {
+    console.log('myVariable changed to:', isRecording);
+    if (!isRecording) {
+      stopRecording()
+    }
+  }, [isRecording]); // 将myVariable作为依赖项传入useEffect
+
   const getMediaStream = async(alertFlag = false) => {
     console.log('点击一次，调用次数AAAAAAAAAAAAAAAAAAAAA')
     try {
@@ -90,6 +95,7 @@ const VoiceInput = ({ onCallback }) => {
     } else if (isMediaSupport === true) {
         // recordingStartTimestamp.value = Date.now()
 
+        recorder.stop()
         recorder.destroy()
         // 每次点击开始录音时，重新初始化Recorder
         recorder = new Recorder({
@@ -100,13 +106,14 @@ const VoiceInput = ({ onCallback }) => {
         })
         recorderFn.audioStart(recorder)
         console.log('startRecordVoice')
-        setTimeout(() => {
-            if (isRecording) {
-              recorderFn.audioStop(recorder)
-              recorderFn.audioPlay(recorder)
-              recorder.destroy()
-            }
-        }, 120000)
+        // setTimeout(() => {
+          if (isRecording) {
+            recorderFn.audioStop(recorder)
+            // recorderFn.audioPlay(recorder)
+            recorder.stop()
+            recorder.destroy()
+          }
+        // }, 120000)
     } else if (isMediaSupport === false) {
         const res = await getMediaStream(flag)
         // @ts-ignore
@@ -129,29 +136,36 @@ const VoiceInput = ({ onCallback }) => {
     setIsRecording(false);
     // 实际停止录音逻辑...
     recorderFn.audioStop(recorder)
-    recorderFn.audioPlay(recorder)
-    // recorder.destroy()
+    console.log('录音结束', recorder, recorderFn)
+    recorder.stop()
+    recorder.destroy()
+    // recorderFn.audioPlay(recorder)
+    // recorder.stop()
   };
 
   // 长按开始录音
   const handleTouchStart = useCallback((e) => {
     e.preventDefault()
     // 录音时暂停所有播放
-    const audioElementAll = document.getElementsByClassName(`voiceReportPlayer`);
-    for (let i = 0; i < audioElementAll.length; i++) {
-        // @ts-ignore
-          audioElementAll[i].pause()
+    try {
+      const audioElementAll = document.getElementsByClassName(`voiceReportPlayer`);
+      for (let i = 0; i < audioElementAll.length; i++) {
+          // @ts-ignore
+            audioElementAll[i].pause()
+      }
+    } catch (error) {
+      console.error('暂停播放失败', error)
     }
-    console.log('下压触发onTouchStartonTouchStartonTouchStartonTouchStartonTouchStartonTouchStartonTouchStart', voiceTimeout.current)
     // @ts-ignore
     clearTimeout(voiceTimeout.current);
     // @ts-ignore
+    startRecording();
     // const temp =  // 延迟100ms防止点击误触
     // // @ts-ignore
     const timeoutId = setTimeout(() => {
-      startRecording();
+      // startRecording();
       // console.log('执行录音setVoiceTimeoutsetVoiceTimeoutsetVoiceTimeoutsetVoiceTimeoutsetVoiceTimeoutsetVoiceTimeout', voiceTimeout.current)
-    }, 100)
+    }, 30)
     // @ts-ignore
     voiceTimeout.current = timeoutId
   }, []);
@@ -181,7 +195,6 @@ const VoiceInput = ({ onCallback }) => {
         // @ts-ignore
         clearTimeout(voiceTimeout.current);
         stopRecording();
-        // 移动到按钮外部+100距离，取消录音，不发送请求
       }
     }
   }, []);
@@ -191,25 +204,28 @@ const VoiceInput = ({ onCallback }) => {
     console.log('释放下压动作handleTouchEndhandleTouchEndhandleTouchEndhandleTouchEnd', voiceTimeout.current)
     // @ts-ignore
     clearTimeout(voiceTimeout.current);
+    const blobs = recorder.getWAVBlob()
     stopRecording(); // 移动到按钮外部，停止录音
     // 停止录音并发送请求
-    recorderFn.audioPlay(recorder)
+    // recorderFn.audioPlay(recorder)
     // @ts-ignore
     // const formData = new FormData();
     // formData.append('audio', recorder.getWAVBlob(), 'recording.wav');
     requestAnimationFrame(async () => {
       if (cancelRequest.current) {
         cancelRequest.current = false
-        recorder.destroy()
+        recorder.stop()
         return
       }
-      const blobs = recorder.getWAVBlob()
       if (blobs.size === 44) return
       const res = await voiceIat(blobs);
+      recorder.stop()
       recorder.destroy()
       // @ts-ignore
+      clearTimeout(voiceTimeout.current);
+      stopRecording(); // 移动到按钮外部，停止录音
+      // @ts-ignore
       if (res.code && res.code === 200) {
-        console.log('voiceIat', res)
         if (!res.data) {
           // onCallback && onCallback('今天天气咋样')
           console.log(`未识别到内容，请重新录制`)
@@ -231,12 +247,13 @@ const VoiceInput = ({ onCallback }) => {
     if (!buttonRef.current.contains(e.target)) {
       if (isRecording) {
         // @ts-ignore
-        clearTimeout(voiceTimeout.current);
-        stopRecording(); // 移动到按钮外部，取消录音
+        // clearTimeout(voiceTimeout.current);
+        // stopRecording(); // 移动到按钮外部，取消录音
         requestAnimationFrame(async () => {
           const blobs = recorder.getWAVBlob()
           if (blobs.size === 44) return
           const res = await voiceIat(blobs);
+          recorder.stop()
           recorder.destroy()
           // @ts-ignore
           if (res.code && res.code === 200) {
@@ -317,7 +334,7 @@ const VoiceInput = ({ onCallback }) => {
               height={40}
               width={140}
               preview={false}
-              style={{filter: 'invert(100%)'}}
+              style={{filter: 'invert(100%)', WebkitUserSelect: 'none', msUserSelect: 'none', MozUserSelect: 'none',userSelect: 'none'}}
               src={require('../../assets/icon/recording.gif')}
             />
           )}

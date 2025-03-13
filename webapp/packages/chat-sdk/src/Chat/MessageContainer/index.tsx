@@ -85,6 +85,7 @@ const MessageContainer: React.FC<Props> = ({
             msgData,
             filters,
           } = msgItem;
+          console.log('MessageContainermsgItemmsgItemmsgItemmsgItemmsgItemmsgItemmsgItemmsgItemmsgItem', msgItem)
 
           return (
             <div key={msgId} id={`${msgId}`} className={styles.messageItem}>
@@ -125,7 +126,7 @@ const MessageContainer: React.FC<Props> = ({
                 </>
               )}
               {
-              <audio className={`voiceReportPlayer voicePlayer${msgId}`} />}
+              <audio className={`voiceReportPlayer voicePlayer${msgItem.id}`} />}
             </div>
           );
         })}

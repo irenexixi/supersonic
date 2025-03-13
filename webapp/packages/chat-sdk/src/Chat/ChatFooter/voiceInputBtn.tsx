@@ -135,7 +135,7 @@ const VoiceInput = ({ onCallback }) => {
 
   // 长按开始录音
   const handleTouchStart = useCallback((e) => {
-    event.preventDefault()
+    e.preventDefault()
     // 录音时暂停所有播放
     const audioElementAll = document.getElementsByClassName(`voiceReportPlayer`);
     for (let i = 0; i < audioElementAll.length; i++) {
@@ -158,7 +158,7 @@ const VoiceInput = ({ onCallback }) => {
   
   // 移动取消录音
   const handleTouchMove = useCallback((e) => {
-    event.preventDefault()
+    e.preventDefault()
     // @ts-ignore
     // clearTimeout(voiceTimeout.current);
     // stopRecording()

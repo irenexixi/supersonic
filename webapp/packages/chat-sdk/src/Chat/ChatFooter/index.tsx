@@ -62,6 +62,7 @@ const ChatFooter: ForwardRefRenderFunction<any, Props> = (
   const [focused, setFocused] = useState(false);
   const [showVoice, setShowVoice] = useState(false);
   const inputRef = useRef<any>();
+  const inputSendBtnRef = useRef<any>();
   const fetchRef = useRef(0);
 
   const inputFocus = () => {
@@ -199,6 +200,7 @@ const ChatFooter: ForwardRefRenderFunction<any, Props> = (
   }, [stepOptions]);
 
   const sendMsg = (value: string) => {
+    console.log(value, 'sendMsgsendMsgsendMsgsendMsgsendMsgsendMsg', stepOptions, modelOptions)
     const option = Object.keys(stepOptions)
       .reduce((result: any[], item) => {
         result = result.concat(stepOptions[item]);
@@ -216,6 +218,16 @@ const ChatFooter: ForwardRefRenderFunction<any, Props> = (
       onSendMsg(value.trim(), option?.dataSetId);
     }
   };
+  const voiceAutoSend = (value: string) => {
+      setShowVoice(false)
+      setTimeout(() => {
+        onInputMsgChange(value)
+        requestAnimationFrame(() => {
+          inputSendBtnRef.current?.click();
+          setShowVoice(true)
+        })
+      }, 20)
+  }
   const resizeIframe = () => {
     window.addEventListener('resize', function() {
       const newHeight = window.innerHeight;
@@ -432,6 +444,7 @@ const ChatFooter: ForwardRefRenderFunction<any, Props> = (
             value={inputMsg}
             onChange={(e) => {
               onInputMsgChange(e.target.value);
+              console.log(e.target.value, 'onInputMsgChangeonInputMsgChangeonInputMsgChangeonInputMsgChange')
             }}
             autoSize={{minRows:1,maxRows:6}} 
             placeholder={currentAgent ? '有什么问题尽管问我': '有什么问题尽管问我'}
@@ -444,7 +457,7 @@ const ChatFooter: ForwardRefRenderFunction<any, Props> = (
               sendMsg(inputMsg);
             }}
           >
-            <IconFont type="icon-ios-send" />
+            <IconFont ref={inputSendBtnRef} type="icon-ios-send" />
           </div>
         </div>
       </div>
@@ -464,7 +477,7 @@ const ChatFooter: ForwardRefRenderFunction<any, Props> = (
         </div>
         <div className={styles.composerInputWrapper}>
           <div className={styles.voiceInput}>
-            <VoiceInput onCallback={ onSendMsg }></VoiceInput>
+            <VoiceInput onCallback={ voiceAutoSend }></VoiceInput>
           </div>
         </div>
       </div>

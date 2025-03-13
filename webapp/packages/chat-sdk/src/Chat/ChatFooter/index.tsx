@@ -216,6 +216,12 @@ const ChatFooter: ForwardRefRenderFunction<any, Props> = (
       onSendMsg(value.trim(), option?.dataSetId);
     }
   };
+  const resizeIframe = () => {
+    window.addEventListener('resize', function() {
+      const newHeight = window.innerHeight;
+      window.parent.postMessage({ type: 'resize', height: newHeight}, '*')
+    })
+  }
 
   // const autoCompleteDropdownClass = classNames(styles.autoCompleteDropdown, {
   //   [styles.mobile]: isMobile,
@@ -364,7 +370,7 @@ const ChatFooter: ForwardRefRenderFunction<any, Props> = (
       <div style={{ display: showVoice ? 'none' : 'flex' }} className={styles.composer}>
         <div
           className={styles.swtichInput}
-          onClick={() => setShowVoice(!showVoice)}>
+          onClick={() => {setShowVoice(!showVoice); resizeIframe()}}>
           {/* <IconFont type="icon-zhinengzhuli" className={styles.toolIcon} /> */}
           {/* <WifiOutlined className={styles.toolIcon} style={{transform: 'rotate(90deg)'}}/> */}
           <Image
@@ -445,7 +451,7 @@ const ChatFooter: ForwardRefRenderFunction<any, Props> = (
       <div style={{ display: showVoice ? 'flex' : 'none' }} className={styles.composer}>
         <div
           className={styles.swtichInput}
-          onClick={() => setShowVoice(!showVoice)}>
+          onClick={() => {setShowVoice(!showVoice);resizeIframe()}}>
           {/* <IconFont type="icon-ios-send" className={styles.toolIcon} /> */}
           {/* <EditOutlined className={styles.toolIcon} /> */}
           <Image

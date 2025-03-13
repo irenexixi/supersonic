@@ -135,6 +135,12 @@ const VoiceInput = ({ onCallback }) => {
 
   // 长按开始录音
   const handleTouchStart = useCallback((e) => {
+    // 录音时暂停所有播放
+    const audioElementAll = document.getElementsByClassName(`voiceReportPlayer`);
+    for (let i = 0; i < audioElementAll.length; i++) {
+        // @ts-ignore
+          audioElementAll[i].pause()
+    }
     console.log('下压触发onTouchStartonTouchStartonTouchStartonTouchStartonTouchStartonTouchStartonTouchStart', voiceTimeout.current)
     // @ts-ignore
     clearTimeout(voiceTimeout.current);

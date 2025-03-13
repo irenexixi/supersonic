@@ -65,8 +65,16 @@ const Tools: React.FC<Props> = ({
   const voiceData = useRef('')
 
   const voiceReport = (msgData: any = {}) => {
-    const audioElements = document.getElementsByClassName('voiceReportPlayer')[0];
-    if (voiceData.current) {
+    const audioElementAll = document.getElementsByClassName(`voiceReportPlayer`);
+    const audioElements = document.getElementsByClassName(`voicePlayer${msgData.queryId}`)[0];
+    for (let i = 0; i < audioElementAll.length; i++) {
+      if (audioElementAll[i] !== audioElements) {
+        // @ts-ignore
+          audioElementAll[i].pause()
+      }
+    }
+    // 再次点击且已经请求数据就缓存播放
+    if (voiceData.current && `A${msgData.queryId}A` === voiceData.current) {
       setExportLoading(false);
       // @ts-ignore
       if (audioElements.paused) {
@@ -93,8 +101,9 @@ const Tools: React.FC<Props> = ({
     }
     // @ts-ignore
     voiceTts({ text }).then((res) => {
-      voiceData.current = res
-      const audioElement = document.getElementsByClassName('voiceReportPlayer')[0];
+      // @ts-ignore
+      voiceData.current = `A${msgData.queryId}A`
+      const audioElement = document.getElementsByClassName(`voicePlayer${msgData.queryId}`)[0];
       if (audioElement) {
         // @ts-ignore
         audioElement.pause();

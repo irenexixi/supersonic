@@ -68,7 +68,6 @@ const MessageContainer: React.FC<Props> = ({
   const messageContainerClass = classNames(styles.messageContainer, { [styles.mobile]: isMobile });
   return (
     <div id={id} className={messageContainerClass}>
-      <audio className="voiceReportPlayer" />
       <div className={styles.messageList}>
         {messageList.map((msgItem: MessageItem, index: number) => {
           const {
@@ -125,6 +124,8 @@ const MessageContainer: React.FC<Props> = ({
                   />
                 </>
               )}
+              {
+              <audio className={`voiceReportPlayer voicePlayer${msgId}`} />}
             </div>
           );
         })}

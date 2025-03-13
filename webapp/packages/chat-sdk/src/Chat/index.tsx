@@ -166,6 +166,7 @@ const Chat: ForwardRefRenderFunction<any, Props> = (
         onSendMsg(initialMsgParams.msg, [], initialMsgParams.modelId, initialMsgParams);
         return;
       }
+      sendHelloRsp();
       return;
     }
     updateHistoryMsg(1);
@@ -182,6 +183,19 @@ const Chat: ForwardRefRenderFunction<any, Props> = (
       messageContainerEle?.removeEventListener('scroll', handleScroll);
     };
   }, [historyInited]);
+
+  const sendHelloRsp = (agent?: AgentType) => {
+    if (noInput) {
+      return;
+    }
+    setMessageList([
+      {
+        id: uuid(),
+        type: MessageTypeEnum.AGENT_LIST,
+        msg: agent?.name || currentAgent?.name || agentList?.[0]?.name,
+      },
+    ]);
+  };
 
   const appentHelloRep = (msgList: MessageItem[]) => {
     if (noInput) {
@@ -381,7 +395,6 @@ const Chat: ForwardRefRenderFunction<any, Props> = (
   };
 
   const sendMsg = (msg: string, modelId?: number) => {
-    console.log('(??????????????????????????????????????????????????????)')
     onSendMsg(msg, messageList, modelId);
     if (isMobile) {
       inputBlur();

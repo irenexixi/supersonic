@@ -92,16 +92,17 @@ const Tools: React.FC<Props> = ({
     if (msgData.textSummary) {
         text = '总结：' + msgData.textSummary;
     }
-    const times = text.length / 60 * 1000
-    setTimeout(() => {
-      setExportLoading(false);
-    }, times);
+    // const times = text.length / 30 * 1000
+    // setTimeout(() => {
+    //   setExportLoading(false);
+    // }, times);
     if (audioElements) {
       // @ts-ignore
       audioElements.pause();
     }
     // @ts-ignore
     voiceTts({ text }).then((res) => {
+      setExportLoading(false);
       // @ts-ignore
       voiceData.current = `A${msgData.queryId}A`
       const audioElement = document.getElementsByClassName(`voicePlayer${msgData.queryId}`)[0];
@@ -120,6 +121,7 @@ const Tools: React.FC<Props> = ({
         });
       }
     }).catch((err) => {
+      setExportLoading(false);
       console.log('voiceReport', err);
     });
   }

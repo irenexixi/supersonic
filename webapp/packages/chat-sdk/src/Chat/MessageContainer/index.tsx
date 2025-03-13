@@ -125,8 +125,7 @@ const MessageContainer: React.FC<Props> = ({
                   />
                 </>
               )}
-              {
-              <audio className={`voiceReportPlayer voicePlayer${msgItem.id}`} />}
+              {/* {<audio className={`voiceReportPlayer voicePlayer${msgId}`} />} */}
             </div>
           );
         })}

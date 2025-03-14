@@ -65,6 +65,7 @@ const Tools: React.FC<Props> = ({
   const voiceData = useRef('')
 
   const voiceReport = (msgData: any = {}) => {
+    console.log(msgData)
     let audioCreate = document.getElementsByClassName(`voicePlayer${msgData.queryId}`)[0];
     if (!audioCreate) {
       const audioCreate = document.createElement('audio');

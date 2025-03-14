@@ -377,11 +377,13 @@ const ChatFooter: ForwardRefRenderFunction<any, Props> = (
       </div>
       <div style={{ display: showVoice ? 'none' : 'flex' }} className={styles.composer}>
         <div
+          style={{ display: showVoice ? 'none' : 'none' }}
           className={styles.swtichInput}
           onClick={() => {setShowVoice(!showVoice); resizeIframe()}}>
           {/* <IconFont type="icon-zhinengzhuli" className={styles.toolIcon} /> */}
           {/* <WifiOutlined className={styles.toolIcon} style={{transform: 'rotate(90deg)'}}/> */}
           <Image
+            style={{ display: showVoice ? 'none' : 'none' }}
             className={styles.toolIcon} 
             width={26}
             height={26}
@@ -457,7 +459,7 @@ const ChatFooter: ForwardRefRenderFunction<any, Props> = (
           </div>
         </div>
       </div>
-      <div style={{ display: showVoice ? 'flex' : 'none' }} className={styles.composer}>
+      <div style={{ display: showVoice ? 'none' : 'none' }} className={styles.composer}>
         <div
           className={styles.swtichInput}
           onClick={() => {setShowVoice(!showVoice);resizeIframe()}}>

@@ -208,7 +208,10 @@ const ChatItem: React.FC<Props> = ({
         isRefresh
       );
       // 没有回答上会显示一遍推荐问题
-      if(res?.data?.chatContext?.sqlInfo?.resultType === 'text') {
+      if(res?.data?.chatContext?.sqlInfo?.resultType === 'text' 
+        || !(res?.data?.queryResults)
+        || res?.data?.queryResults?.length === 0
+      ) {
         onCouldNotAnswer()
       }
     } catch (e) {

@@ -197,12 +197,17 @@ export function voiceIat(byteData: any) {
 // 文本转语音
 export async function voiceTts(text: string) {
   const response = await request.post(`${prefix}/chat/voice/tts`, {
-    responseType: 'blob',
     data: text,
   });
   
-  const audioUrl = URL.createObjectURL(response);
-  return audioUrl
+  return response
+
+  // return axios.post<any>(`${prefix}/chat/voice/tts`, {text}, {
+  //   headers: {
+  //     'Content-Disposition': 'attachment; filename="audio.mp3"',
+  //     'Content-Type': 'audio/mpeg'
+  //   }
+  // })
 }
 
 export function dataInterpret(

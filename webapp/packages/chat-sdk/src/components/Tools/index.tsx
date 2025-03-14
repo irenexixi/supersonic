@@ -65,6 +65,7 @@ const Tools: React.FC<Props> = ({
   const voiceData = useRef('')
 
   const voiceReport = (msgData: any = {}) => {
+    console.log(msgData)
     let audioCreate = document.getElementsByClassName(`voicePlayer${msgData.queryId}`)[0];
     if (!audioCreate) {
       const audioCreate = document.createElement('audio');
@@ -78,20 +79,28 @@ const Tools: React.FC<Props> = ({
    
     requestAnimationFrame( () => {
       const audioElementAll = document.getElementsByClassName(`voiceReportPlayer`);
+      const iconList = document.getElementsByClassName(`voice-icon`)
       for (let i = 0; i < audioElementAll.length; i++) {
         if (audioElementAll[i] !== audioCreate) {
           // @ts-ignore
             audioElementAll[i].pause()
         }
       }
+      for (let index = 0; index < iconList.length; index++) {
+        iconList[index].classList.remove('voice-icon')
+      }
       // 再次点击且已经请求数据就缓存播放
       if (voiceData.current && `A${msgData.queryId}A` === voiceData.current && audioCreate) {
         setExportLoading(false);
         // @ts-ignore
         if (audioCreate.paused) {
+          const icon = document.getElementsByClassName(`voice-icon-${msgData.queryId}`)[0];
+          icon.classList.add('voice-icon')
           // @ts-ignore
           audioCreate.play()
         } else {
+          const icon = document.getElementsByClassName(`voice-icon-${msgData.queryId}`)[0];
+          icon.classList.remove('voice-icon')
           // @ts-ignore
           audioCreate.pause();
         }
@@ -113,26 +122,32 @@ const Tools: React.FC<Props> = ({
       }
       // @ts-ignore
       voiceTts({ text }).then((res) => {
-        setExportLoading(false);
-        // @ts-ignore
-        voiceData.current = `A${msgData.queryId}A`
-        const audioElement = document.getElementsByClassName(`voicePlayer${msgData.queryId}`)[0];
-        // @ts-ignore
-        if (audioElement) {
-        // @ts-ignore
-          // audioElement.src = 'http://downsc.chinaz.net/files/download/sound1/201206/1638.mp3'
+        if (res && res.code === 200 && res.data) {
+          setExportLoading(false);
           // @ts-ignore
-          audioElement.pause();
+          voiceData.current = `A${msgData.queryId}A`
+          const audioElement = document.getElementsByClassName(`voicePlayer${msgData.queryId}`)[0];
           // @ts-ignore
-          audioElement.src = res
+          if (audioElement) {
           // @ts-ignore
-          audioElement.load()
-          // @ts-ignore
-          audioElement.play();
-          audioElement.addEventListener('ended', () => {
+            // audioElement.src = 'http://downsc.chinaz.net/files/download/sound1/201206/1638.mp3'
             // @ts-ignore
-            // URL.revokeObjectURL(res);
-          });
+            audioElement.pause();
+            // @ts-ignore
+            audioElement.src = res.data
+            // @ts-ignore
+            audioElement.load()
+            // @ts-ignore
+            audioElement.play();
+            const icon = document.getElementsByClassName(`voice-icon-${msgData.queryId}`)[0];
+            icon.classList.add('voice-icon')
+            audioElement.addEventListener('ended', () => {
+              // @ts-ignore
+              // URL.revokeObjectURL(res);
+              const icon = document.getElementsByClassName(`voice-icon-${msgData.queryId}`)[0];
+              icon.classList.remove('voice-icon')
+            });
+          }
         }
       }).catch((err) => {
         setExportLoading(false);
@@ -150,7 +165,7 @@ const Tools: React.FC<Props> = ({
           {/* <div>这个回答正确吗？</div> */}
 
           <div className={`${prefixCls}-feedback-left`}>
-            {(!isParserError && msgData?.queryId) && (
+            {(!isParserError && msgData?.textSummary) && (
               <>
                 <Button
                   size="small"
@@ -165,7 +180,7 @@ const Tools: React.FC<Props> = ({
                   type="text"
                   loading={exportLoading}
                 >
-                  <SoundOutlined />
+                  <SoundOutlined className={`voice-icon-${msgData.queryId}`} />
                   {/* <span className={`${prefixCls}-font-style`}>语音播放</span> */}
                   <span className={`${prefixCls}-font-style`}></span>
                 </Button>

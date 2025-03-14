@@ -151,7 +151,7 @@ const Tools: React.FC<Props> = ({
           {/* <div>这个回答正确吗？</div> */}
 
           <div className={`${prefixCls}-feedback-left`}>
-            {(!isParserError && msgData?.queryId) && (
+            {(!isParserError && msgData?.textSummary) && (
               <>
                 <Button
                   size="small"

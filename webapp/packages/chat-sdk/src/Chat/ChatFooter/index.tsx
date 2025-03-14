@@ -78,6 +78,24 @@ const ChatFooter: ForwardRefRenderFunction<any, Props> = (
     inputBlur,
   }));
 
+  const handleContextMenu = (event) => {
+    // @ts-ignore
+    if (event.target.tagName.toLowerCase() === 'img') {
+      event.preventDefault();
+    }
+  }
+  useEffect(() => {
+    // 添加事件监听器
+    document.addEventListener('contextmenu', handleContextMenu);
+
+    // 清理函数，组件卸载时移除事件监听器
+    return () => {
+      document.removeEventListener('contextmenu', handleContextMenu);
+    };
+  }, []);
+
+
+
   const initEvents = () => {
     const autoCompleteEl = document.getElementById('chatInput');
     autoCompleteEl!.addEventListener('compositionstart', compositionStartEvent);

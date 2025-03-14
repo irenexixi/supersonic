@@ -169,7 +169,7 @@ const ExecuteItem: React.FC<Props> = ({
           )}
           {data.textSummary && (
             <p className={`${prefixCls}-step-bottom`}>
-              <span className={`${prefixCls}-step-title`} style={{ marginRight: 5 }}>总结:</span>
+              <span className={`${prefixCls}-step-title`} style={{ marginRight: 5 }}>智能洞察:</span>
               {data.textSummary}
             </p>
           )}

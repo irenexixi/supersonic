@@ -25,8 +25,7 @@ const AgentTip: React.FC<Props> = ({ id,currentAgent, onSendMsg }) => {
             或许您可以问：
           </div> :
           <div className={styles.title}>
-          您好，智能助理【{currentAgent.name}
-          】将与您对话，试着问：
+          您好，我是{currentAgent.name}，我已经上线了咪咕重点产品活跃、会员及播放相关的数据，您可以试着问我：
         </div> 
         }
         <div className={styles.content}>

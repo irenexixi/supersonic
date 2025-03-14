@@ -101,7 +101,7 @@ const Tools: React.FC<Props> = ({
       // 只读总结
       let text = msgData.textResult;
       if (msgData.textSummary) {
-          text = '总结：' + msgData.textSummary;
+          text = '智能洞察：' + msgData.textSummary;
       }
       if (audioCreate) {
         // @ts-ignore

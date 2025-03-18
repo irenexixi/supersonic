@@ -108,7 +108,7 @@ const Tools: React.FC<Props> = ({
       }
       console.log(msgData, msgData.textResult, msgData.textSummary);
       // 只读总结
-      let text = msgData.textResult;
+      let text = '';
       if (msgData.textSummary) {
           text = '智能洞察：' + msgData.textSummary;
       }

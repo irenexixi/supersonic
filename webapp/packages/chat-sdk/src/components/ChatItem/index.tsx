@@ -89,6 +89,7 @@ const ChatItem: React.FC<Props> = ({
 }) => {
   const [parseLoading, setParseLoading] = useState(false);
   const [isThinking, setIsThinking] = useState(false);
+  const [isDataInterpret, setIsDataInterpret] = useState(false);
   const [parseTimeCost, setParseTimeCost] = useState<ParseTimeCostType>();
   const [parseInfo, setParseInfo] = useState<ChatContextType>();
   const [parseInfoOptions, setParseInfoOptions] = useState<ChatContextType[]>([]);
@@ -193,10 +194,6 @@ const ChatItem: React.FC<Props> = ({
     }
     try {
       const res: any = await chatExecute(msg, conversationId!, parseInfoValue, agentId);
-      const resOfSummary:any = await dataInterpret(res?.data?.textResult || '' ,msg, conversationId!, parseInfoValue, agentId)
-      if(res?.data){
-        res.data.textSummary = resOfSummary?.data?.textSummary
-      }
       const valid = updateData(res);
       onMsgDataLoaded?.(
         {
@@ -213,6 +210,38 @@ const ChatItem: React.FC<Props> = ({
         || res?.data?.queryResults?.length === 0
       ) {
         onCouldNotAnswer()
+      }
+      // 如果开启了数据解读功能，会调用数据解释接口，获取数据解释结果
+      if (currentAgent?.chatAppConfig?.DATA_INTERPRETER?.enable) {
+        setIsDataInterpret(true);
+        setTimeout(async()=>{
+          try{
+            const resOfSummary:any = await dataInterpret(res?.data?.textResult || '' ,msg, conversationId!, parseInfoValue, agentId)
+            if(res?.data){
+              res.data.textSummary = resOfSummary?.data?.textSummary
+            }
+            onMsgDataLoaded?.(
+              {
+                ...res.data,
+                parseInfos,
+                queryId: parseInfoValue.queryId,
+              },
+              valid,
+              isRefresh
+            );
+            // 这里需要再执行一遍显示推荐问题，不然推荐问题会消失
+            if(res?.data?.chatContext?.sqlInfo?.resultType === 'text' 
+              || !(res?.data?.queryResults)
+              || res?.data?.queryResults?.length === 0
+            ) {
+              onCouldNotAnswer()
+            }
+          } catch(err) {
+            throw(err)
+          } finally {
+            setIsDataInterpret(false)
+          }
+        },0)
       }
     } catch (e) {
       onCouldNotAnswer()
@@ -360,7 +389,7 @@ const ChatItem: React.FC<Props> = ({
   useEffect(() => {
     isThinkingRef.current = isThinking;
   }, [isThinking]);
-
+  
   const onSwitchEntity = async (entityId: string) => {
     setEntitySwitchLoading(true);
     const res = await switchEntity(entityId, data?.chatContext?.modelId, conversationId || 0);
@@ -617,6 +646,7 @@ const ChatItem: React.FC<Props> = ({
                 executeItemNode={executeItemNode}
                 isDeveloper={isDeveloper}
                 renderCustomExecuteNode={renderCustomExecuteNode}
+                isDataInterpret={isDataInterpret}
               />
             </div>
           </Spin>

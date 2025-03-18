@@ -24,6 +24,7 @@ type Props = {
   triggerResize?: boolean;
   isDeveloper?: boolean;
   isSimpleMode?: boolean;
+  isDataInterpret?: boolean;
 };
 
 const ExecuteItem: React.FC<Props> = ({
@@ -41,6 +42,7 @@ const ExecuteItem: React.FC<Props> = ({
   triggerResize,
   isDeveloper,
   isSimpleMode,
+  isDataInterpret
 }) => {
   const prefixCls = `${PREFIX_CLS}-item`;
   const [showMsgContentTable, setShowMsgContentTable] = useState<boolean>(false);
@@ -167,9 +169,10 @@ const ExecuteItem: React.FC<Props> = ({
               onMsgContentTypeChange={setMsgContentType}
             />
           )}
+          {isDataInterpret && getNodeTip(`智能洞察中`)}
           {data.textSummary && (
             <p className={`${prefixCls}-step-bottom`}>
-              <span className={`${prefixCls}-step-title`} style={{ marginRight: 5 }}>智能洞察:</span>
+              <span className={`${prefixCls}-step-title`} style={{ marginRight: 5 }}>智能洞察：</span>
               {data.textSummary}
             </p>
           )}

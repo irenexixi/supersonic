@@ -169,7 +169,9 @@ const ExecuteItem: React.FC<Props> = ({
               onMsgContentTypeChange={setMsgContentType}
             />
           )}
-          {isDataInterpret && getNodeTip(`智能洞察中`)}
+           <p className={`${prefixCls}-step-bottom`}>
+              {isDataInterpret && getNodeTip(`智能洞察中`)}
+           </p>
           {data.textSummary && (
             <p className={`${prefixCls}-step-bottom`}>
               <span className={`${prefixCls}-step-title`} style={{ marginRight: 5 }}>智能洞察：</span>

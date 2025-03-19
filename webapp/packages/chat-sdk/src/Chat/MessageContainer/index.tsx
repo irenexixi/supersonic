@@ -85,7 +85,6 @@ const MessageContainer: React.FC<Props> = ({
             msgData,
             filters,
           } = msgItem;
-          console.log('MessageContainermsgItemmsgItemmsgItemmsgItemmsgItemmsgItemmsgItemmsgItemmsgItem', msgItem)
 
           return (
             <div key={msgId} id={`${msgId}`} className={styles.messageItem}>

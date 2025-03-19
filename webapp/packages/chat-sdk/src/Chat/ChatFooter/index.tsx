@@ -1,6 +1,6 @@
 import IconFont from '../../components/IconFont';
 import { getTextWidth, groupByColumn, isMobile } from '../../utils/utils';
-import { AutoComplete, Select, Tag, Input, Button, Image } from 'antd';
+import { AutoComplete, Select, Tag, Input, Button, Image, message } from 'antd';
 import classNames from 'classnames';
 import { debounce } from 'lodash';
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
@@ -10,6 +10,7 @@ import { AgentType, ModelType } from '../type';
 import { searchRecommend } from '../../service';
 import styles from './style.module.less';
 import VoiceInput from './voiceInputBtn';
+import { useGlobalContext } from '../../context/GlobalContext';
 // import { useComposing } from '../../hooks/useComposing';
 // import { WifiOutlined, EditOutlined} from '@ant-design/icons';
 
@@ -64,6 +65,8 @@ const ChatFooter: ForwardRefRenderFunction<any, Props> = (
   const inputRef = useRef<any>();
   const inputSendBtnRef = useRef<any>();
   const fetchRef = useRef(0);
+  const { globalState } = useGlobalContext();
+  const canSendMsgRef = useRef(globalState.canSendMsg);
 
   const inputFocus = () => {
     inputRef.current?.focus();
@@ -94,6 +97,9 @@ const ChatFooter: ForwardRefRenderFunction<any, Props> = (
     };
   }, []);
 
+  useEffect(() => {
+    canSendMsgRef.current = globalState.canSendMsg;
+  }, [globalState.canSendMsg]);
 
 
   const initEvents = () => {
@@ -218,7 +224,6 @@ const ChatFooter: ForwardRefRenderFunction<any, Props> = (
   }, [stepOptions]);
 
   const sendMsg = (value: string) => {
-    console.log(value, 'sendMsgsendMsgsendMsgsendMsgsendMsgsendMsg', stepOptions, modelOptions)
     const option = Object.keys(stepOptions)
       .reduce((result: any[], item) => {
         result = result.concat(stepOptions[item]);
@@ -368,7 +373,11 @@ const ChatFooter: ForwardRefRenderFunction<any, Props> = (
         <div
           className={styles.toolItem}
           onClick={() => {
-            onAddConversation();
+            if(!canSendMsgRef.current) {
+              message.info('请等待上个问题回答完毕');
+            } else {
+              onAddConversation();
+            }
           }}
         >
           <IconFont type="icon-c003xiaoxiduihua" className={styles.toolIcon} />
@@ -460,7 +469,6 @@ const ChatFooter: ForwardRefRenderFunction<any, Props> = (
             value={inputMsg}
             onChange={(e) => {
               onInputMsgChange(e.target.value);
-              console.log(e.target.value, 'onInputMsgChangeonInputMsgChangeonInputMsgChangeonInputMsgChange')
             }}
             autoSize={{minRows:1,maxRows:6}} 
             placeholder={currentAgent ? '有什么问题尽管问我': '有什么问题尽管问我'}

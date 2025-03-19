@@ -97,6 +97,15 @@ const Copilot: ForwardRefRenderFunction<any, Props> = (
     [styles.c2System]: integrateSystem === 'c2',
   });
 
+  const currentAgentFuc = (agent) => {
+    setCurrentAgent((prev)=>{
+      const agentStr = JSON.stringify(agent)
+      const prevStr = JSON.stringify(prev)
+      if (agentStr === prevStr) {
+        return prev
+      }
+    })
+  }
   return (
     <>
       <div
@@ -134,7 +143,7 @@ const Copilot: ForwardRefRenderFunction<any, Props> = (
               isDeveloper={isDeveloper}
               integrateSystem={integrateSystem}
               isCopilot
-              onCurrentAgentChange={setCurrentAgent}
+              onCurrentAgentChange={currentAgentFuc}
               onReportMsgEvent={onReportMsgEvent}
               ref={chatRef}
             />

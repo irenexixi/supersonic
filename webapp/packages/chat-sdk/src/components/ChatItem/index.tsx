@@ -27,6 +27,7 @@ import { AgentType } from '../../Chat/type';
 import dayjs, { Dayjs } from 'dayjs';
 import { exportCsvFile } from '../../utils/utils';
 import Loading from './Loading';
+import { useGlobalContext } from '../../context/GlobalContext';
 // import { useMethodRegister } from '../../hooks';
 
 type Props = {
@@ -111,6 +112,8 @@ const ChatItem: React.FC<Props> = ({
   );
   const [isParserError, setIsParseError] = useState<boolean>(false);
   const isThinkingRef = useRef(isThinking);
+  const { setGlobalState, globalState } = useGlobalContext();
+  const canSendMsgRef = useRef(globalState.canSendMsg);
   const resetState = () => {
     setParseLoading(false);
     setParseTimeCost(undefined);
@@ -211,8 +214,20 @@ const ChatItem: React.FC<Props> = ({
       ) {
         onCouldNotAnswer()
       }
+      setGlobalState((prev)=>{
+        return {
+          ...prev,
+          canSendMsg: true,
+        }
+      })
       // 如果开启了数据解读功能，会调用数据解释接口，获取数据解释结果
       if (currentAgent?.chatAppConfig?.DATA_INTERPRETER?.enable) {
+        setGlobalState((prev)=>{
+          return {
+            ...prev,
+            canSendMsg: false,
+          }
+        })
         setIsDataInterpret(true);
         setTimeout(async()=>{
           try{
@@ -236,7 +251,19 @@ const ChatItem: React.FC<Props> = ({
             ) {
               onCouldNotAnswer()
             }
+            setGlobalState((prev)=>{
+              return {
+                ...prev,
+                canSendMsg: true,
+              }
+            })
           } catch(err) {
+            setGlobalState((prev)=>{
+              return {
+                ...prev,
+                canSendMsg: true,
+              }
+            })
             throw(err)
           } finally {
             setIsDataInterpret(false)
@@ -248,6 +275,12 @@ const ChatItem: React.FC<Props> = ({
       const tip = SEARCH_EXCEPTION_TIP;
       setExecuteTip(SEARCH_EXCEPTION_TIP);
       setDataCache({ ...dataCache, [parseInfoValue!.id!]: { tip } });
+      setGlobalState((prev)=>{
+        return {
+          ...prev,
+          canSendMsg: true,
+        }
+      })
     }
     if (isSwitchParseInfo) {
       setEntitySwitchLoading(false);
@@ -271,6 +304,12 @@ const ChatItem: React.FC<Props> = ({
   };
 
   const sendMsg = async () => {
+    setGlobalState((prev)=>{
+      return {
+        ...prev,
+        canSendMsg: false,
+      }
+    })
     const responseDiv = document.getElementById('thoughts-response-'+msgId)
     if (responseDiv) {
       responseDiv.textContent = ''
@@ -297,13 +336,24 @@ const ChatItem: React.FC<Props> = ({
       queryThoughtsInSSE(msg,agentId,messageFunc,errorFunc,closeFunc)
     }
     setParseLoading(true);
-    const parseData: any = await chatParse({
-      queryText: msg,
-      chatId: conversationId,
-      modelId,
-      agentId,
-      filters: filter,
-    });
+    let parseData: any = {};
+    try {
+      parseData = await chatParse({
+        queryText: msg,
+        chatId: conversationId,
+        modelId,
+        agentId,
+        filters: filter,
+      });
+    } catch (error) {
+      setGlobalState((prev)=>{
+        return {
+          ...prev,
+          canSendMsg: true,
+        }
+      })
+      return
+    }
     // 预设问题如果包含该提问，让其结果在思考后才出结果
     if (currentAgent?.examples.includes(msg)) {
       await new Promise(resolve => {
@@ -335,6 +385,12 @@ const ChatItem: React.FC<Props> = ({
       setParseTip(state === ParseStateEnum.FAILED && errorMsg ? errorMsg : PARSE_ERROR_TIP);
 
       setParseInfo({ queryId } as any);
+      setGlobalState((prev)=>{
+        return {
+          ...prev,
+          canSendMsg: true,
+        }
+      })
       return;
     }
     onUpdateMessageScroll?.();
@@ -358,6 +414,13 @@ const ChatItem: React.FC<Props> = ({
     setDateInfo(parseInfoValue?.dateInfo);
     if (parseInfos.length === 1) {
       onExecute(parseInfoValue, parseInfos);
+    } else {
+      setGlobalState((prev)=>{
+        return {
+          ...prev,
+          canSendMsg: true,
+        }
+      })
     }
   };
 
@@ -386,10 +449,15 @@ const ChatItem: React.FC<Props> = ({
     }
     initChatItem(msg, msgData);
   }, [msg, msgData]);
+
   useEffect(() => {
     isThinkingRef.current = isThinking;
   }, [isThinking]);
-  
+
+  useEffect(() => {
+    canSendMsgRef.current = globalState.canSendMsg;
+  }, [globalState.canSendMsg]);
+
   const onSwitchEntity = async (entityId: string) => {
     setEntitySwitchLoading(true);
     const res = await switchEntity(entityId, data?.chatContext?.modelId, conversationId || 0);

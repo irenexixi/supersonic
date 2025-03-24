@@ -65,7 +65,7 @@ const Chat: ForwardRefRenderFunction<any, Props> = (
     const [historyInited, setHistoryInited] = useState(false);
     const [currentConversation, setCurrentConversation] = useState<
       ConversationDetailType | undefined
-    >(isMobile ? { chatId: 0, chatName: '问答' } : undefined);
+    >(undefined);
     const [historyVisible, setHistoryVisible] = useState(false);
     const [agentList, setAgentList] = useState<AgentType[]>([]);
     const [currentAgent, setCurrentAgent] = useState<AgentType>();
@@ -80,7 +80,8 @@ const Chat: ForwardRefRenderFunction<any, Props> = (
     const chatFooterRef = useRef<any>();
     const { globalState } = useGlobalContext();
     const canSendMsgRef = useRef(globalState.canSendMsg);
-  
+    const [messageApi,contextHolder] = message.useMessage();
+
     useImperativeHandle(ref, () => ({
       sendCopilotMsg,
     }));
@@ -244,24 +245,35 @@ const Chat: ForwardRefRenderFunction<any, Props> = (
     };
 
     const updateHistoryMsg = async (page: number) => {
-      const res = await getHistoryMsg(page, currentConversation!.chatId, 3);
-      const { hasNextPage, list } = res?.data || { hasNextPage: false, list: [] };
-      const msgList = [...convertHistoryMsg(list), ...(page === 1 ? [] : messageList)];
-        /* 需求：无论是否有聊天记录都要有招呼消消息————start */
-        if(res.data.hasNextPage){
-          setMessageList(msgList);
+      messageApi.open({
+        type: 'loading',
+        content: '聊天记录加载中..',
+        duration: 0,
+      });
+      try {
+        const res = await getHistoryMsg(page, currentConversation!.chatId, 3);
+        const { hasNextPage, list } = res?.data || { hasNextPage: false, list: [] };
+        const msgList = [...convertHistoryMsg(list), ...(page === 1 ? [] : messageList)];
+          /* 需求：无论是否有聊天记录都要有招呼消消息————start */
+          if(res.data.hasNextPage){
+            setMessageList(msgList);
+          } else {
+            appentHelloRep(msgList);
+          }
+          /* 需求：无论是否有聊天记录都要有招呼消息————end */    
+        setHasNextPage(hasNextPage);
+        if (page === 1) {
+          updateMessageContainerScroll();
+          setHistoryInited(true);
+          inputFocus();
         } else {
-          appentHelloRep(msgList);
+          const msgEle = document.getElementById(`${messageList[0]?.id}`);
+          msgEle?.scrollIntoView();
         }
-        /* 需求：无论是否有聊天记录都要有招呼消息————end */    
-      setHasNextPage(hasNextPage);
-      if (page === 1) {
-        updateMessageContainerScroll();
-        setHistoryInited(true);
-        inputFocus();
-      } else {
-        const msgEle = document.getElementById(`${messageList[0]?.id}`);
-        msgEle?.scrollIntoView();
+      } catch (error) {
+        console.error(error)
+      } finally {
+        messageApi.destroy()
       }
     };
 
@@ -390,6 +402,7 @@ const Chat: ForwardRefRenderFunction<any, Props> = (
     };
 
     const onAddConversation = () => {
+      sendHelloRsp()
       conversationRef.current?.onAddConversation();
       inputFocus();
     };
@@ -422,7 +435,8 @@ const Chat: ForwardRefRenderFunction<any, Props> = (
     });
 
     return (
-      <ConfigProvider locale={locale}>   
+      <ConfigProvider locale={locale}>
+        {contextHolder}   
         <div className={chatClass}>
             <div className={styles.chatSection}>
               {!isMobile && agentList.length > 1 && agentListVisible && (
@@ -475,7 +489,7 @@ const Chat: ForwardRefRenderFunction<any, Props> = (
                         integrateSystem={integrateSystem}
                         onMsgDataLoaded={onMsgDataLoaded}
                         onSendMsg={onSendMsg}
-                        onCouldNotAnswer={pushHelloRep}
+                        onCouldNotAnswer={()=>{updateMessageContainerScroll();pushHelloRep()}}
                       />
                       {!noInput && (
                         <ChatFooter

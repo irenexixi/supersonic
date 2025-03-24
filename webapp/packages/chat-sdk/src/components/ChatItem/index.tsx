@@ -244,6 +244,7 @@ const ChatItem: React.FC<Props> = ({
               valid,
               isRefresh
             );
+            onUpdateMessageScroll?.()
             // 这里需要再执行一遍显示推荐问题，不然推荐问题会消失
             if(res?.data?.chatContext?.sqlInfo?.resultType === 'text' 
               || !(res?.data?.queryResults)
@@ -345,7 +346,11 @@ const ChatItem: React.FC<Props> = ({
         agentId,
         filters: filter,
       });
+      if(!(parseData?.data?.state === 'COMPLETED')) {
+        onCouldNotAnswer()
+      }
     } catch (error) {
+      onCouldNotAnswer()
       setGlobalState((prev)=>{
         return {
           ...prev,

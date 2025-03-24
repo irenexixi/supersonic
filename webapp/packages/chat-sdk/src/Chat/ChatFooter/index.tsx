@@ -294,48 +294,46 @@ const ChatFooter: ForwardRefRenderFunction<any, Props> = (
     );
   });
 
-  const associateOptionNodes = Object.keys(stepOptions).map(key => {
+  const mergedArrayValuesFromStepOptions = Object.keys(stepOptions).reduce((result:any[], key) => {
+    result = result.concat(stepOptions[key]);
+    return result;
+  }, []);
+  const associateOptionNodes = mergedArrayValuesFromStepOptions.map(option => {
+    let optionValue =
+      Object.keys(stepOptions).length === 1
+        ? option.recommend
+        : `${option.dataSetName || ''}${option.recommend}`;
+    if (inputMsg[0] === '/') {
+      const agent = agentList.find(item => inputMsg.includes(item.name));
+      optionValue = agent ? `/${agent.name} ${option.recommend}` : optionValue;
+    }
     return (
-      <OptGroup key={key} label={key}>
-        {stepOptions[key].map(option => {
-          let optionValue =
-            Object.keys(stepOptions).length === 1
-              ? option.recommend
-              : `${option.dataSetName || ''}${option.recommend}`;
-          if (inputMsg[0] === '/') {
-            const agent = agentList.find(item => inputMsg.includes(item.name));
-            optionValue = agent ? `/${agent.name} ${option.recommend}` : optionValue;
-          }
-          return (
-            <Option
-              key={`${option.recommend}${option.dataSetName ? `_${option.dataSetName}` : ''}`}
-              value={`${optionValue}${HOLDER_TAG}`}
-              className={styles.searchOption}
+      <Option
+        key={`${option.recommend}${option.dataSetName ? `_${option.dataSetName}` : ''}`}
+        value={`${optionValue}${HOLDER_TAG}`}
+        className={styles.searchOption}
+      >
+        <div className={styles.optionContent}>
+          {option.schemaElementType && (
+            <Tag
+              className={styles.semanticType}
+              color={
+                option.schemaElementType === SemanticTypeEnum.DIMENSION ||
+                option.schemaElementType === SemanticTypeEnum.MODEL
+                  ? 'blue'
+                  : option.schemaElementType === SemanticTypeEnum.VALUE
+                  ? 'geekblue'
+                  : 'cyan'
+              }
             >
-              <div className={styles.optionContent}>
-                {option.schemaElementType && (
-                  <Tag
-                    className={styles.semanticType}
-                    color={
-                      option.schemaElementType === SemanticTypeEnum.DIMENSION ||
-                      option.schemaElementType === SemanticTypeEnum.MODEL
-                        ? 'blue'
-                        : option.schemaElementType === SemanticTypeEnum.VALUE
-                        ? 'geekblue'
-                        : 'cyan'
-                    }
-                  >
-                    {SEMANTIC_TYPE_MAP[option.schemaElementType] ||
-                      option.schemaElementType ||
-                      '维度'}
-                  </Tag>
-                )}
-                {option.subRecommend}
-              </div>
-            </Option>
-          );
-        })}
-      </OptGroup>
+              {SEMANTIC_TYPE_MAP[option.schemaElementType] ||
+                option.schemaElementType ||
+                '维度'}
+            </Tag>
+          )}
+          {option.subRecommend}
+        </div>
+      </Option>
     );
   });
 

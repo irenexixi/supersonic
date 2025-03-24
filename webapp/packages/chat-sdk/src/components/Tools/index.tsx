@@ -76,7 +76,6 @@ const Tools: React.FC<Props> = ({
       const parentDiv = document.getElementsByClassName('anticon-sound')[0]
       parentDiv.appendChild(audioCreate);
     }
-   
     requestAnimationFrame( () => {
       const audioElementAll = document.getElementsByClassName(`voiceReportPlayer`);
       const iconList = document.getElementsByClassName(`voice-icon`)
@@ -106,7 +105,6 @@ const Tools: React.FC<Props> = ({
         }
         return
       }
-      console.log(msgData, msgData.textResult, msgData.textSummary);
       // 只读总结
       let text = '';
       if (msgData.textSummary) {
@@ -141,12 +139,29 @@ const Tools: React.FC<Props> = ({
             audioElement.play();
             const icon = document.getElementsByClassName(`voice-icon-${msgData.queryId}`)[0];
             icon.classList.add('voice-icon')
-            audioElement.addEventListener('ended', () => {
+            
+            const handleEndedWrapper = function() {
+              handleEnded(icon)
+            }
+            const handleEnded = function(icon) {
               // @ts-ignore
-              // URL.revokeObjectURL(res);
-              const icon = document.getElementsByClassName(`voice-icon-${msgData.queryId}`)[0];
-              icon.classList.remove('voice-icon')
-            });
+              icon?.classList?.remove('voice-icon')
+              // @ts-ignore
+              console.log('ended: ' + audioElement.currentTime, audioElement.duration);
+            }
+            audioElement.removeEventListener('ended', handleEndedWrapper)
+            audioElement.addEventListener('ended', handleEndedWrapper)
+            // audioElement.addEventListener('timeupdate', function() {
+            //   // 输出当前的播放时间
+            //   // @ts-ignore
+            //   console.log('Current time: ' + audioElement.currentTime, audioElement.duration);
+            //   // @ts-ignore
+            //   if (audioElement.currentTime === audioElement.duration) {
+            //     // 您可以在这里添加其他逻辑，例如更新进度条或显示剩余时间等。
+            //     // const icon = document.getElementsByClassName(`voice-icon-${msgData.queryId}`)[0];
+            //     icon?.classList?.remove('voice-icon')
+            //   }
+            // })
           }
         }
       }).catch((err) => {
@@ -180,7 +195,7 @@ const Tools: React.FC<Props> = ({
                   type="text"
                   loading={exportLoading}
                 >
-                  <SoundOutlined className={`voice-icon-${msgData.queryId}`} />
+                  <SoundOutlined className={`voice-icon-${msgData.queryId} voice-icon-default`} />
                   {/* <span className={`${prefixCls}-font-style`}>语音播放</span> */}
                   <span className={`${prefixCls}-font-style`}></span>
                 </Button>

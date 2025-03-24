@@ -20,7 +20,7 @@ const Settings: ProLayoutProps & {
   //   ignoreFlatMenu: true,
   // },
 };
-export const publicPath = '/webapp/blackRiver/';
-export const basePath = '/webapp/blackRiver/';
+export const publicPath = '/webapp/redsea/';
+export const basePath = '/webapp/redsea/';
 
 export default Settings;

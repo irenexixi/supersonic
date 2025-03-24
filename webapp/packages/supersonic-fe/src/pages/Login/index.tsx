@@ -96,7 +96,7 @@ const LoginPage: React.FC = () => {
                       color="#296DF3"
                       style={{ display: 'inline-block', marginTop: 8 }}
                     />
-                    <div>黑河ChatBI</div>
+                    <div>红海ChatBI</div>
                   </Space>
                 </h3>
                 <Item name="name" rules={[{ required: true }]} label="">

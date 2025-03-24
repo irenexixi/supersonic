@@ -676,7 +676,7 @@ const ChatItem: React.FC<Props> = ({
             />
           )}
         </> */}
-        {/* todo 这里放思考过程 */}
+
         {isThinking && getNodeTip('深度思考中')}
         <div id={'thoughts-response-' + msgId} className='thoughts-container'></div>
         {executeMode && (

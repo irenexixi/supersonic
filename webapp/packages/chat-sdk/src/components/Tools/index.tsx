@@ -62,57 +62,32 @@ const Tools: React.FC<Props> = ({
 
   const { call } = useContext(ChartItemContext);
   
-  const voiceData = useRef('')
-
+  // 改造为只有1个audio标签,点击播放就播放,在次点击就停止.
   const voiceReport = (msgData: any = {}) => {
-    console.log(msgData)
-    let audioCreate = document.getElementsByClassName(`voicePlayer${msgData.queryId}`)[0];
-    if (!audioCreate) {
-      const audioCreate = document.createElement('audio');
-      audioCreate.className = `voiceReportPlayer voicePlayer${msgData.queryId}`;
-      audioCreate.style.width = '0';
-      audioCreate.style.height = '0';
-      audioCreate.style.position = 'absolute';
-      const parentDiv = document.getElementsByClassName('anticon-sound')[0]
-      parentDiv.appendChild(audioCreate);
-    }
-    requestAnimationFrame( () => {
-      const audioElementAll = document.getElementsByClassName(`voiceReportPlayer`);
+    const voicePlay = function(msgData: any = {}) {
+      const audioElementCur = document.getElementsByClassName('voiceReportPlayer');
+      // iconList拿到正在播放的voice
       const iconList = document.getElementsByClassName(`voice-icon`)
-      for (let i = 0; i < audioElementAll.length; i++) {
-        if (audioElementAll[i] !== audioCreate) {
-          // @ts-ignore
-            audioElementAll[i].pause()
-        }
-      }
-      for (let index = 0; index < iconList.length; index++) {
-        iconList[index].classList.remove('voice-icon')
-      }
-      // 再次点击且已经请求数据就缓存播放
-      if (voiceData.current && `A${msgData.queryId}A` === voiceData.current && audioCreate) {
-        setExportLoading(false);
-        // @ts-ignore
-        if (audioCreate.paused) {
-          const icon = document.getElementsByClassName(`voice-icon-${msgData.queryId}`)[0];
-          icon.classList.add('voice-icon')
-          // @ts-ignore
-          audioCreate.play()
-        } else {
-          const icon = document.getElementsByClassName(`voice-icon-${msgData.queryId}`)[0];
-          icon.classList.remove('voice-icon')
-          // @ts-ignore
-          audioCreate.pause();
-        }
+      if (audioElementCur.length === 0) {
         return
       }
+      // 有正在播放的,停止播放并且清除样式,且不再继续执行
+      if (iconList.length > 0) {
+          // @ts-ignore
+          audioElementCur[0].pause()
+          iconList[0]?.classList.remove('voice-icon')
+          // 当前播放为A ---> 若点B的时候直接播放B，若点A的话就停止A
+          // @ts-ignore
+          if (audioElementCur[0].dataset.index === `${msgData.queryId}`) {
+            setExportLoading(false);
+            return
+          }
+      }
+
       // 只读总结
       let text = '';
       if (msgData.textSummary) {
           text = '智能洞察：' + msgData.textSummary;
-      }
-      if (audioCreate) {
-        // @ts-ignore
-        audioCreate.pause();
       }
       if (!text) {
         console.log('语音播报失败', '返回的文本数据缺失');
@@ -123,29 +98,27 @@ const Tools: React.FC<Props> = ({
         if (res && res.code === 200 && res.data) {
           setExportLoading(false);
           // @ts-ignore
-          voiceData.current = `A${msgData.queryId}A`
-          const audioElement = document.getElementsByClassName(`voicePlayer${msgData.queryId}`)[0];
+          const audioElement = document.getElementsByClassName('voiceReportPlayer')[0];
+          const voicingIcon = document.getElementsByClassName(`voice-icon-${msgData.queryId}`)[0]
           // @ts-ignore
           if (audioElement) {
-          // @ts-ignore
-            // audioElement.src = 'http://downsc.chinaz.net/files/download/sound1/201206/1638.mp3'
-            // @ts-ignore
-            audioElement.pause();
             // @ts-ignore
             audioElement.src = res.data
             // @ts-ignore
-            audioElement.load()
+            // audioElement.load()
             // @ts-ignore
             audioElement.play();
-            const icon = document.getElementsByClassName(`voice-icon-${msgData.queryId}`)[0];
-            icon.classList.add('voice-icon')
+            voicingIcon.classList.add('voice-icon')
+            // @ts-ignore
+            audioElement.dataset.index = msgData.queryId
             
             const handleEndedWrapper = function() {
-              handleEnded(icon)
+              handleEnded(voicingIcon, audioElement)
             }
-            const handleEnded = function(icon) {
+            const handleEnded = function(icon, audio) {
               // @ts-ignore
               icon?.classList?.remove('voice-icon')
+              audio.dataset.index = ''
               // @ts-ignore
               console.log('ended: ' + audioElement.currentTime, audioElement.duration);
             }
@@ -168,7 +141,24 @@ const Tools: React.FC<Props> = ({
         setExportLoading(false);
         console.log('voiceReport', err);
       });
-    })
+    }
+    let audioCreate = document.getElementsByClassName('voiceReportPlayer')[0];
+    if (!audioCreate) {
+      const audioCreate = document.createElement('audio');
+      audioCreate.className = `voiceReportPlayer voicePlayer${msgData.queryId}`;
+      audioCreate.style.width = '0';
+      audioCreate.style.height = '0';
+      audioCreate.style.position = 'absolute';
+      const parentDiv = document.getElementsByClassName('anticon-sound')[0]
+      parentDiv.appendChild(audioCreate);
+      setTimeout(() => {
+        voicePlay(msgData)
+      }, 100)
+    } else {
+      voicePlay(msgData)
+    }
+    // 取消requestAnimationFrame，改为setTimeout
+    // requestAnimationFrame(() => {})
   }
 
 

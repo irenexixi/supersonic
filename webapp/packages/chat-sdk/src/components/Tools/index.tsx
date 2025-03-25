@@ -104,46 +104,46 @@ const Tools: React.FC<Props> = ({
         setTimeout(() => {
           // 延迟关闭loading效果，delay时间视作加载语音耗时
           setExportLoading(false);
-          // @ts-ignore
-          const audioElement = document.getElementsByClassName('voiceReportPlayer')[0];
-          const voicingIcon = document.getElementsByClassName(`voice-icon-${msgData.queryId}`)[0];
-          // @ts-ignore
-          if (audioElement) {
-            // @ts-ignore
-            audioElement.src = res.data
-            // @ts-ignore
-            // audioElement.load()
-            // @ts-ignore
-            audioElement.play();
-            voicingIcon.classList.add('voice-icon')
-            // @ts-ignore
-            audioElement.dataset.index = msgData.queryId
-            
-            const handleEndedWrapper = function() {
-              handleEnded(voicingIcon, audioElement)
-            }
-            const handleEnded = function(icon, audio) {
-              // @ts-ignore
-              icon?.classList?.remove('voice-icon')
-              audio.dataset.index = ''
-              // @ts-ignore
-              console.log('ended: ' + audioElement.currentTime, audioElement.duration);
-            }
-            audioElement.removeEventListener('ended', handleEndedWrapper)
-            audioElement.addEventListener('ended', handleEndedWrapper)
-            // audioElement.addEventListener('timeupdate', function() {
-            //   // 输出当前的播放时间
-            //   // @ts-ignore
-            //   console.log('Current time: ' + audioElement.currentTime, audioElement.duration);
-            //   // @ts-ignore
-            //   if (audioElement.currentTime === audioElement.duration) {
-            //     // 您可以在这里添加其他逻辑，例如更新进度条或显示剩余时间等。
-            //     // const icon = document.getElementsByClassName(`voice-icon-${msgData.queryId}`)[0];
-            //     icon?.classList?.remove('voice-icon')
-            //   }
-            // })
-          }
         }, 1000)
+        // @ts-ignore
+        const audioElement = document.getElementsByClassName('voiceReportPlayer')[0];
+        const voicingIcon = document.getElementsByClassName(`voice-icon-${msgData.queryId}`)[0];
+        // @ts-ignore
+        if (audioElement) {
+          // @ts-ignore
+          audioElement.src = res.data
+          // @ts-ignore
+          // audioElement.load()
+          // @ts-ignore
+          audioElement.play();
+          voicingIcon.classList.add('voice-icon')
+          // @ts-ignore
+          audioElement.dataset.index = msgData.queryId
+          
+          const handleEndedWrapper = function() {
+            handleEnded(voicingIcon, audioElement)
+          }
+          const handleEnded = function(icon, audio) {
+            // @ts-ignore
+            icon?.classList?.remove('voice-icon')
+            audio.dataset.index = ''
+            // @ts-ignore
+            console.log('ended: ' + audioElement.currentTime, audioElement.duration);
+          }
+          audioElement.removeEventListener('ended', handleEndedWrapper)
+          audioElement.addEventListener('ended', handleEndedWrapper)
+          // audioElement.addEventListener('timeupdate', function() {
+          //   // 输出当前的播放时间
+          //   // @ts-ignore
+          //   console.log('Current time: ' + audioElement.currentTime, audioElement.duration);
+          //   // @ts-ignore
+          //   if (audioElement.currentTime === audioElement.duration) {
+          //     // 您可以在这里添加其他逻辑，例如更新进度条或显示剩余时间等。
+          //     // const icon = document.getElementsByClassName(`voice-icon-${msgData.queryId}`)[0];
+          //     icon?.classList?.remove('voice-icon')
+          //   }
+          // })
+        }
       }
     }
     const audioPlayer = document.getElementsByClassName('voiceReportPlayer')[0];

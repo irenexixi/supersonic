@@ -61,20 +61,23 @@ const Tools: React.FC<Props> = ({
   });
 
   const { call } = useContext(ChartItemContext);
+  const createAudio = function() {
+    const audioNew = document.createElement('audio');
+    audioNew.className = 'voiceReportPlayer';
+    audioNew.style.width = '0';
+    audioNew.style.height = '0';
+    audioNew.style.position = 'absolute';
+    const parentDiv = document.getElementById('messageContainer');
+    parentDiv && parentDiv.appendChild(audioNew);
+  }
   // 使用useEffect钩子在组件加载后操作DOM
   useEffect(() => {
     const audioDom = document.getElementsByClassName('voiceReportPlayer')[0];
     if (!audioDom) {
-      const audioNew = document.createElement('audio');
-      audioNew.className = 'voiceReportPlayer';
-      audioNew.style.width = '0';
-      audioNew.style.height = '0';
-      audioNew.style.position = 'absolute';
-      const parentDiv = document.getElementById('messageContainer');
-      parentDiv && parentDiv.appendChild(audioNew);
+      createAudio();
     }
   }, []); // 空数组作为依赖项，表示这个effect只在组件挂载和卸载时执行一次
-  
+
   // 改造为只有1个audio标签,点击播放就播放,在次点击就停止.
   const voiceReport = (msgData: any = {}) => {
     const voicePlay = function(msgData: any = {}) {
@@ -161,13 +164,7 @@ const Tools: React.FC<Props> = ({
     const audioPlayer = document.getElementsByClassName('voiceReportPlayer')[0];
     if (!audioPlayer) {
       console.log('audio未成功创建，播放异常。')
-      const audioNew = document.createElement('audio');
-      audioNew.className = 'voiceReportPlayer';
-      audioNew.style.width = '0';
-      audioNew.style.height = '0';
-      audioNew.style.position = 'absolute';
-      const parentDiv = document.getElementById('messageContainer');
-      parentDiv && parentDiv.appendChild(audioNew);
+      createAudio();
       setTimeout(() => {
         voicePlay(msgData)
       }, 1000)

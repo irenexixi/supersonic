@@ -64,6 +64,7 @@ const Tools: React.FC<Props> = ({
   const createAudio = function() {
     const audioNew = document.createElement('audio');
     audioNew.className = 'voiceReportPlayer';
+    audioNew.setAttribute('preload', 'auto');
     audioNew.style.width = '0';
     audioNew.style.height = '0';
     audioNew.style.position = 'absolute';
@@ -99,7 +100,8 @@ const Tools: React.FC<Props> = ({
             return
           }
       }
-      const res = {data: msgData.ttsUrl, code: 200}
+      const urlNew = msgData.ttsUrl.replace('dc.migu.cn', 'da.migu.cn:8443')
+      const res = {data: urlNew, code: 200}
       if (res && res.code === 200 && res.data) {
         setTimeout(() => {
           // 延迟关闭loading效果，delay时间视作加载语音耗时
@@ -113,12 +115,14 @@ const Tools: React.FC<Props> = ({
           // @ts-ignore
           audioElement.src = res.data
           // @ts-ignore
-          // audioElement.load()
-          // @ts-ignore
-          audioElement.play();
-          voicingIcon.classList.add('voice-icon')
-          // @ts-ignore
-          audioElement.dataset.index = msgData.queryId
+          audioElement.load()
+          setTimeout(() => {
+            // @ts-ignore
+            audioElement.play();
+            voicingIcon.classList.add('voice-icon')
+            // @ts-ignore
+            audioElement.dataset.index = msgData.queryId
+          }, 1500)
           
           const handleEndedWrapper = function() {
             handleEnded(voicingIcon, audioElement)
@@ -128,7 +132,7 @@ const Tools: React.FC<Props> = ({
             icon?.classList?.remove('voice-icon')
             audio.dataset.index = ''
             // @ts-ignore
-            console.log('ended: ' + audioElement.currentTime, audioElement.duration);
+            // console.log('ended: ' + audioElement.currentTime, audioElement.duration);
           }
           audioElement.removeEventListener('ended', handleEndedWrapper)
           audioElement.addEventListener('ended', handleEndedWrapper)
@@ -278,7 +282,7 @@ const Tools: React.FC<Props> = ({
                 >
                   <SoundOutlined className={`voice-icon-${msgData.queryId} voice-icon-default`} />
                   {/* <span className={`${prefixCls}-font-style`}>语音播放</span> */}
-                  <audio className={`voiceReportPlayer`} style={{ position: 'absolute', width: '0', height: '0' }}></audio>
+                  <audio className={`voiceReportPlayer`} preload='auto' style={{ position: 'absolute', width: '0', height: '0' }}></audio>
                   <span className={`${prefixCls}-font-style`}></span>
                 </Button>
                 {!isMobile && (

@@ -10,7 +10,7 @@ import {
 import { MsgDataType } from '../../common/type';
 import { Button } from 'antd';
 import { CLS_PREFIX } from '../../common/constants';
-import { useContext, useState, useRef } from 'react';
+import { useContext, useEffect, useState, useRef } from 'react';
 import classNames from 'classnames';
 import { updateQAFeedback, voiceTts } from '../../service';
 import { useMethodRegister } from '../../hooks';
@@ -61,6 +61,19 @@ const Tools: React.FC<Props> = ({
   });
 
   const { call } = useContext(ChartItemContext);
+  // 使用useEffect钩子在组件加载后操作DOM
+  useEffect(() => {
+    let audioCreate = document.getElementsByClassName('voiceReportPlayer')[0];
+    if (!audioCreate) {
+      const audioCreate = document.createElement('audio');
+      audioCreate.className = 'voiceReportPlayer';
+      audioCreate.style.width = '0';
+      audioCreate.style.height = '0';
+      audioCreate.style.position = 'absolute';
+      const parentDiv = document.getElementById('messageContainer');
+      parentDiv && parentDiv.appendChild(audioCreate);
+    }
+  }, []); // 空数组作为依赖项，表示这个effect只在组件挂载和卸载时执行一次
   
   // 改造为只有1个audio标签,点击播放就播放,在次点击就停止.
   const voiceReport = (msgData: any = {}) => {
@@ -99,7 +112,7 @@ const Tools: React.FC<Props> = ({
           setExportLoading(false);
           // @ts-ignore
           const audioElement = document.getElementsByClassName('voiceReportPlayer')[0];
-          const voicingIcon = document.getElementsByClassName(`voice-icon-${msgData.queryId}`)[0]
+          const voicingIcon = document.getElementsByClassName(`voice-icon-${msgData.queryId}`)[0];
           // @ts-ignore
           if (audioElement) {
             // @ts-ignore
@@ -144,13 +157,14 @@ const Tools: React.FC<Props> = ({
     }
     let audioCreate = document.getElementsByClassName('voiceReportPlayer')[0];
     if (!audioCreate) {
+      alert('请先安装语音插件')
       const audioCreate = document.createElement('audio');
       audioCreate.className = `voiceReportPlayer voicePlayer${msgData.queryId}`;
       audioCreate.style.width = '0';
       audioCreate.style.height = '0';
       audioCreate.style.position = 'absolute';
-      const parentDiv = document.getElementsByClassName('anticon-sound')[0]
-      parentDiv.appendChild(audioCreate);
+      const parentDiv = document.getElementById('messageContainer');
+      parentDiv && parentDiv.appendChild(audioCreate);
       setTimeout(() => {
         voicePlay(msgData)
       }, 100)

@@ -80,6 +80,7 @@ const Tools: React.FC<Props> = ({
 
   // 改造为只有1个audio标签,点击播放就播放,在次点击就停止.
   const voiceReport = (msgData: any = {}) => {
+    console.log(msgData, 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
     const voicePlay = function(msgData: any = {}) {
       const audioElementCur = document.getElementsByClassName('voiceReportPlayer');
       // iconList拿到正在播放的voice
@@ -99,23 +100,11 @@ const Tools: React.FC<Props> = ({
             return
           }
       }
-
-      // 只读总结
-      let text = '';
-      if (msgData.textSummary) {
-          text = '智能洞察：' + msgData.textSummary;
-      }
-      if (!text) {
-        console.log('语音播报失败', '返回的文本数据缺失');
-        return;
-      }
-      // @ts-ignore
-      voiceTts({ text }).then((res) => {
-        if (res && res.code === 200 && res.data) {
-          setTimeout(() => {
-            // 延迟关闭loading效果，delay时间视作加载语音耗时
-            setExportLoading(false);
-          }, 2000)
+      const res = {data: msgData.ttsUrl, code: 200}
+      if (res && res.code === 200 && res.data) {
+        setTimeout(() => {
+          // 延迟关闭loading效果，delay时间视作加载语音耗时
+          setExportLoading(false);
           // @ts-ignore
           const audioElement = document.getElementsByClassName('voiceReportPlayer')[0];
           const voicingIcon = document.getElementsByClassName(`voice-icon-${msgData.queryId}`)[0];
@@ -155,6 +144,98 @@ const Tools: React.FC<Props> = ({
             //   }
             // })
           }
+        }, 1000)
+      }
+    }
+    const audioPlayer = document.getElementsByClassName('voiceReportPlayer')[0];
+    if (!audioPlayer) {
+      console.log('audio未成功创建，播放异常。')
+      createAudio();
+      setTimeout(() => {
+        voicePlay(msgData)
+      }, 1000)
+    } else {
+      voicePlay(msgData)
+    }
+  }
+  // // 改造为只有1个audio标签,点击播放就播放,在次点击就停止.
+  const voiceReportOld = (msgData: any = {}) => {
+    console.log(msgData, 'msgDatamsgDatamsgDatamsgDatamsgData')
+    const voicePlay = function(msgData: any = {}) {
+      const audioElementCur = document.getElementsByClassName('voiceReportPlayer');
+      // iconList拿到正在播放的voice
+      const iconList = document.getElementsByClassName(`voice-icon`)
+      if (audioElementCur.length === 0) {
+        return
+      }
+      // 有正在播放的,停止播放并且清除样式,且不再继续执行
+      if (iconList.length > 0) {
+          // @ts-ignore
+          audioElementCur[0].pause()
+          iconList[0]?.classList.remove('voice-icon')
+          // 当前播放为A ---> 若点B的时候直接播放B，若点A的话就停止A
+          // @ts-ignore
+          if (audioElementCur[0].dataset.index === `${msgData.queryId}`) {
+            setExportLoading(false);
+            return
+          }
+      }
+
+      // 只读总结
+      let text = '';
+      if (msgData.textSummary) {
+          text = '智能洞察：' + msgData.textSummary;
+      }
+      if (!text) {
+        console.log('语音播报失败', '返回的文本数据缺失');
+        return;
+      }
+      // @ts-ignore
+      voiceTts({ text }).then((res) => {
+        if (res && res.code === 200 && res.data) {
+          setTimeout(() => {
+            // 延迟关闭loading效果，delay时间视作加载语音耗时
+            setExportLoading(false);
+            // @ts-ignore
+            const audioElement = document.getElementsByClassName('voiceReportPlayer')[0];
+            const voicingIcon = document.getElementsByClassName(`voice-icon-${msgData.queryId}`)[0];
+            // @ts-ignore
+            if (audioElement) {
+              // @ts-ignore
+              audioElement.src = res.data
+              // @ts-ignore
+              // audioElement.load()
+              // @ts-ignore
+              audioElement.play();
+              voicingIcon.classList.add('voice-icon')
+              // @ts-ignore
+              audioElement.dataset.index = msgData.queryId
+              
+              const handleEndedWrapper = function() {
+                handleEnded(voicingIcon, audioElement)
+              }
+              const handleEnded = function(icon, audio) {
+                // @ts-ignore
+                icon?.classList?.remove('voice-icon')
+                audio.dataset.index = ''
+                // @ts-ignore
+                console.log('ended: ' + audioElement.currentTime, audioElement.duration);
+              }
+              audioElement.removeEventListener('ended', handleEndedWrapper)
+              audioElement.addEventListener('ended', handleEndedWrapper)
+              // audioElement.addEventListener('timeupdate', function() {
+              //   // 输出当前的播放时间
+              //   // @ts-ignore
+              //   console.log('Current time: ' + audioElement.currentTime, audioElement.duration);
+              //   // @ts-ignore
+              //   if (audioElement.currentTime === audioElement.duration) {
+              //     // 您可以在这里添加其他逻辑，例如更新进度条或显示剩余时间等。
+              //     // const icon = document.getElementsByClassName(`voice-icon-${msgData.queryId}`)[0];
+              //     icon?.classList?.remove('voice-icon')
+              //   }
+              // })
+            }
+          }, 1000)
         }
       }).catch((err) => {
         setExportLoading(false);

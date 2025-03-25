@@ -150,6 +150,7 @@ export type MsgDataType = {
   textResult: string;
   errorMsg: string;
   textSummary: string;
+  ttsUrl?: string;
 };
 
 export enum ParseStateEnum {

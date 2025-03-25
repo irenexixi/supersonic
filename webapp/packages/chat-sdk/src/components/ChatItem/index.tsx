@@ -235,9 +235,11 @@ const ChatItem: React.FC<Props> = ({
             if(res?.data){
               res.data.textSummary = resOfSummary?.data?.textSummary
             }
+            // 此处ttsUrl赋值，语音播报功能能够实现，但是本文件onMsgDataLoaded多个,并未对ttsUrl赋值，不知道有无影响？？？？
             onMsgDataLoaded?.(
               {
                 ...res.data,
+                ttsUrl: resOfSummary.data?.ttsUrl,
                 parseInfos,
                 queryId: parseInfoValue.queryId,
               },

@@ -80,7 +80,6 @@ const Tools: React.FC<Props> = ({
 
   // 改造为只有1个audio标签,点击播放就播放,在次点击就停止.
   const voiceReport = (msgData: any = {}) => {
-    console.log(msgData, 'msgDatamsgDatamsgDatamsgDatamsgData')
     const voicePlay = function(msgData: any = {}) {
       const audioElementCur = document.getElementsByClassName('voiceReportPlayer');
       // iconList拿到正在播放的voice

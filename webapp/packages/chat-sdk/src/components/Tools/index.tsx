@@ -63,15 +63,15 @@ const Tools: React.FC<Props> = ({
   const { call } = useContext(ChartItemContext);
   // 使用useEffect钩子在组件加载后操作DOM
   useEffect(() => {
-    let audioCreate = document.getElementsByClassName('voiceReportPlayer')[0];
-    if (!audioCreate) {
-      const audioCreate = document.createElement('audio');
-      audioCreate.className = 'voiceReportPlayer';
-      audioCreate.style.width = '0';
-      audioCreate.style.height = '0';
-      audioCreate.style.position = 'absolute';
+    const audioDom = document.getElementsByClassName('voiceReportPlayer')[0];
+    if (!audioDom) {
+      const audioNew = document.createElement('audio');
+      audioNew.className = 'voiceReportPlayer';
+      audioNew.style.width = '0';
+      audioNew.style.height = '0';
+      audioNew.style.position = 'absolute';
       const parentDiv = document.getElementById('messageContainer');
-      parentDiv && parentDiv.appendChild(audioCreate);
+      parentDiv && parentDiv.appendChild(audioNew);
     }
   }, []); // 空数组作为依赖项，表示这个effect只在组件挂载和卸载时执行一次
   
@@ -109,7 +109,10 @@ const Tools: React.FC<Props> = ({
       // @ts-ignore
       voiceTts({ text }).then((res) => {
         if (res && res.code === 200 && res.data) {
-          setExportLoading(false);
+          setTimeout(() => {
+            // 延迟关闭loading效果，delay时间视作加载语音耗时
+            setExportLoading(false);
+          }, 2000)
           // @ts-ignore
           const audioElement = document.getElementsByClassName('voiceReportPlayer')[0];
           const voicingIcon = document.getElementsByClassName(`voice-icon-${msgData.queryId}`)[0];
@@ -155,24 +158,22 @@ const Tools: React.FC<Props> = ({
         console.log('voiceReport', err);
       });
     }
-    let audioCreate = document.getElementsByClassName('voiceReportPlayer')[0];
-    if (!audioCreate) {
-      alert('请先安装语音插件')
-      const audioCreate = document.createElement('audio');
-      audioCreate.className = `voiceReportPlayer voicePlayer${msgData.queryId}`;
-      audioCreate.style.width = '0';
-      audioCreate.style.height = '0';
-      audioCreate.style.position = 'absolute';
+    const audioPlayer = document.getElementsByClassName('voiceReportPlayer')[0];
+    if (!audioPlayer) {
+      console.log('audio未成功创建，播放异常。')
+      const audioNew = document.createElement('audio');
+      audioNew.className = 'voiceReportPlayer';
+      audioNew.style.width = '0';
+      audioNew.style.height = '0';
+      audioNew.style.position = 'absolute';
       const parentDiv = document.getElementById('messageContainer');
-      parentDiv && parentDiv.appendChild(audioCreate);
+      parentDiv && parentDiv.appendChild(audioNew);
       setTimeout(() => {
         voicePlay(msgData)
-      }, 100)
+      }, 1000)
     } else {
       voicePlay(msgData)
     }
-    // 取消requestAnimationFrame，改为setTimeout
-    // requestAnimationFrame(() => {})
   }
 
 
@@ -201,24 +202,25 @@ const Tools: React.FC<Props> = ({
                 >
                   <SoundOutlined className={`voice-icon-${msgData.queryId} voice-icon-default`} />
                   {/* <span className={`${prefixCls}-font-style`}>语音播放</span> */}
+                  <audio className={`voiceReportPlayer`} style={{ position: 'absolute', width: '0', height: '0' }}></audio>
                   <span className={`${prefixCls}-font-style`}></span>
                 </Button>
                 {!isMobile && (
-                <Button
-                  size="small"
-                  onClick={() => {
-                    setExportLoading(true);
-                    onExportData?.();
-                    setTimeout(() => {
-                      setExportLoading(false);
-                    }, 1000);
-                  }}
-                  type="text"
-                  loading={exportLoading}
-                >
-                  <DownloadOutlined />
-                  <span className={`${prefixCls}-font-style`}>导出数据</span>
-                </Button>
+                  <Button
+                    size="small"
+                    onClick={() => {
+                      setExportLoading(true);
+                      onExportData?.();
+                      setTimeout(() => {
+                        setExportLoading(false);
+                      }, 1000);
+                    }}
+                    type="text"
+                    loading={exportLoading}
+                  >
+                    <DownloadOutlined />
+                    <span className={`${prefixCls}-font-style`}>导出数据</span>
+                  </Button>
                 )}
                 {!isMobile && !isSimpleMode && (
                   <Button

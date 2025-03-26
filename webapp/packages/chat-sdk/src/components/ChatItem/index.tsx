@@ -517,10 +517,10 @@ const ChatItem: React.FC<Props> = ({
       const urlNew = msgData.ttsUrl.replace('dc.migu.cn', 'da.migu.cn:8443')
       const res = {data: urlNew}
       if (res && res.data) {
-        setTimeout(() => {
+        // setTimeout(() => {
           // 延迟关闭loading效果，delay时间视作加载语音耗时
-          setVoiceLoading(false)
-        }, 1000)
+          // setVoiceLoading(false)
+        // }, 1000)
         const audioElement = document.getElementsByClassName('voiceReportPlayer')[0];
         const voicingIcon = document.getElementsByClassName(`voice-icon-${msgData.queryId}`)[0];
         // @ts-ignore
@@ -530,10 +530,57 @@ const ChatItem: React.FC<Props> = ({
           // @ts-ignore
           audioElement.load()
           // @ts-ignore
-          audioElement.play();
-          voicingIcon.classList.add('voice-icon')
+          // audioElement.play();
+          // voicingIcon.classList.add('voice-icon')
           // @ts-ignore
           audioElement.dataset.index = msgData.queryId
+          // 检测是否完全加载
+          // @ts-ignore
+          // function checkIfFullyLoaded() {
+          //   // @ts-ignore
+          //   if (audioElement.readyState >= 4) { // HAVE_ENOUGH_DATA
+          //     console.log("redChat loadedmetadata 音频完全加载");
+          //     // @ts-ignore
+          //     audioElement.play().catch(e => console.error("redChat 播放失败:", e));
+          //   } else {
+          //     setTimeout(checkIfFullyLoaded, 500); // 每隔 500ms 检查一次
+          //   }
+          // }
+          // audioElement.addEventListener("loadedmetadata", () => {
+          //   checkIfFullyLoaded(); // 开始检查
+          // });
+          // 监听 'canplaythrough' 事件（表示可以完整播放）
+          const oaAccount = localStorage.getItem('oaAccount');
+          const accountList = ['liqianqianjs', 'liqianqian', 'jiangjiqi_pt', 'liaokun', 'liaokun_pt']
+          let showTip = false
+          // @ts-ignore
+          if (accountList.indexOf(oaAccount) > -1) {
+            showTip = true
+          }
+          audioElement.addEventListener("canplaythrough", () => {
+            console.log("redChat canplaythrough 音频已完全加载，开始播放");
+            showTip && message.success('即将为您播报语音');
+            // 延迟关闭loading效果，delay时间视作加载语音耗时
+            setVoiceLoading(false)
+            voicingIcon.classList.add('voice-icon')
+            // @ts-ignore
+            audioElement.play().catch(e => {
+              showTip && message.error('自动播放失败，需要用户交互');
+              console.error("redChat 自动播放失败，需要用户交互:", e);
+              // 提示用户点击页面以播放
+              document.body.addEventListener("click", () => {
+                  // @ts-ignore
+                  audioElement.play() 
+                }, { once: true });
+            });
+          });
+
+          // 错误处理
+          audioElement.addEventListener("error", () => {
+            showTip && message.error('音频文件生成中，请稍后再试');
+            setVoiceLoading(false)
+          }); 
+
           const handleEndedWrapper = function() {
             handleEnded(voicingIcon, audioElement)
           }

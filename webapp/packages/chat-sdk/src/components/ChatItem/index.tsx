@@ -29,6 +29,7 @@ import dayjs, { Dayjs } from 'dayjs';
 import { exportCsvFile } from '../../utils/utils';
 import Loading from './Loading';
 import { useGlobalContext } from '../../context/GlobalContext';
+import { set } from 'lodash';
 // import { useMethodRegister } from '../../hooks';
 
 type Props = {
@@ -239,6 +240,7 @@ const ChatItem: React.FC<Props> = ({
             if(res?.data){
               res.data.textSummary = resOfSummary?.data?.textSummary
             }
+            cacheVoiceData(resOfSummary.data?.ttsUrl)
             // 此处ttsUrl赋值，语音播报功能能够实现，但是本文件onMsgDataLoaded多个,并未对ttsUrl赋值，不知道有无影响？？？？
             onMsgDataLoaded?.(
               {
@@ -477,6 +479,22 @@ const ChatItem: React.FC<Props> = ({
     
   }, []); // 空数组作为依赖项，表示这个effect只在组件挂载和卸载时执行一次
 
+  const cacheVoiceData = function(ttsUrl: string) {
+    console.log('ttsUrlttsUrlttsUrlttsUrlttsUrlttsUrlttsUrlttsUrl:', ttsUrl)
+    const audioElementCache = document.getElementsByClassName('cacheVoiceReportPlayer')[0]
+    // @ts-ignore
+    audioElementCache.src = ttsUrl
+    // @ts-ignore
+    audioElementCache.load()
+    setTimeout(() => {
+      // @ts-ignore
+      audioElementCache.load()
+    }, 1000)
+    setTimeout(() => {
+      // @ts-ignore
+      audioElementCache.load()
+    }, 2000)
+  }
   const voiceReport = (msgData: any = {}) => {
     setVoiceLoading(true)
     const voicePlay = function(msgData: any = {}) {

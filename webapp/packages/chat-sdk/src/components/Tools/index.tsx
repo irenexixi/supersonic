@@ -21,10 +21,12 @@ type Props = {
   scoreValue?: number;
   isLastMessage?: boolean;
   isParserError?: boolean;
+  voiceLoading?: boolean;
   isSimpleMode?: boolean;
   msgData?: MsgDataType;
   onExportData?: () => void;
   onReExecute?: (queryId: number) => void;
+  onVoiceReport?: (msgData: any) => void;
   // onReadRes?: () => void;
 };
 
@@ -34,9 +36,11 @@ const Tools: React.FC<Props> = ({
   isLastMessage,
   msgData,
   isParserError = false,
+  voiceLoading = false,
   isSimpleMode = false,
   onExportData,
   onReExecute,
+  onVoiceReport,
   // onReadRes
 }) => {
   const [score, setScore] = useState(scoreValue || 0);
@@ -78,9 +82,20 @@ const Tools: React.FC<Props> = ({
       createAudio();
     }
   }, []); // 空数组作为依赖项，表示这个effect只在组件挂载和卸载时执行一次
+  
+  useEffect(() => {
+    // 当data变化时，这个函数会被调用
+    // handleDataChange(data);
+    setExportLoading(voiceLoading);
+  }, [voiceLoading]);
 
   // 改造为只有1个audio标签,点击播放就播放,在次点击就停止.
   const voiceReport = (msgData: any = {}) => {
+    // 调用父组件的语音播报
+    if (onVoiceReport) {
+      onVoiceReport?.(msgData);
+      return
+    }
     const voicePlay = function(msgData: any = {}) {
       const audioElementCur = document.getElementsByClassName('voiceReportPlayer');
       // iconList拿到正在播放的voice
@@ -93,7 +108,6 @@ const Tools: React.FC<Props> = ({
           // @ts-ignore
           audioElementCur[0].pause()
           iconList[0]?.classList.remove('voice-icon')
-          // 当前播放为A ---> 若点B的时候直接播放B，若点A的话就停止A
           // @ts-ignore
           if (audioElementCur[0].dataset.index === `${msgData.queryId}`) {
             setExportLoading(false);
@@ -134,8 +148,11 @@ const Tools: React.FC<Props> = ({
             // @ts-ignore
             // console.log('ended: ' + audioElement.currentTime, audioElement.duration);
           }
-          audioElement.removeEventListener('ended', handleEndedWrapper)
           audioElement.addEventListener('ended', handleEndedWrapper)
+          audioElement.addEventListener('error', () => {
+            voicePlay(msgData)
+          })
+          removeEventListener
           // audioElement.addEventListener('timeupdate', function() {
           //   // 输出当前的播放时间
           //   // @ts-ignore
@@ -161,6 +178,7 @@ const Tools: React.FC<Props> = ({
       voicePlay(msgData)
     }
   }
+  
   // // 改造为只有1个audio标签,点击播放就播放,在次点击就停止.
   const voiceReportOld = (msgData: any = {}) => {
     const voicePlay = function(msgData: any = {}) {
@@ -255,7 +273,25 @@ const Tools: React.FC<Props> = ({
       voicePlay(msgData)
     }
   }
-
+  // 预加载
+  // const preloadAudio = (msgData: any = {}) => {
+  //   const audioElement1 = document.getElementsByClassName('voiceReportPlayer')[1];
+  //   const audioElement = document.getElementsByClassName('voiceReportPlayer')[0];
+  //   console.log('preloadAudio', audioElement, audioElement1)
+  //   const urlNew = msgData.ttsUrl.replace('dc.migu.cn', 'da.migu.cn:8443')
+  //   if (audioElement1) {
+  //     // @ts-ignore
+  //     audioElement1.src = urlNew
+  //     // @ts-ignore
+  //     audioElement1.load()
+  //   } else if (audioElement && !audioElement1) {
+  //     // @ts-ignore
+  //     audioElement.src = urlNew
+  //     // @ts-ignore
+  //     audioElement.load()
+  //   }
+  //   return true
+  // }
 
   return (
     <div className={prefixCls}>
@@ -270,7 +306,7 @@ const Tools: React.FC<Props> = ({
                 <Button
                   size="small"
                   onClick={() => {
-                    setExportLoading(true);
+                    // setExportLoading(true);
                     voiceReport(msgData);
                     // // onExportData?.();
                     // setTimeout(() => {
@@ -282,7 +318,7 @@ const Tools: React.FC<Props> = ({
                 >
                   <SoundOutlined className={`voice-icon-${msgData.queryId} voice-icon-default`} />
                   {/* <span className={`${prefixCls}-font-style`}>语音播放</span> */}
-                  <audio className={`voiceReportPlayer`} preload='auto' style={{ position: 'absolute', width: '0', height: '0' }}></audio>
+                  {/* <audio className={`voiceReportPlayer`} preload='auto' style={{ position: 'absolute', width: '0', height: '0' }}></audio> */}
                   <span className={`${prefixCls}-font-style`}></span>
                 </Button>
                 {!isMobile && (

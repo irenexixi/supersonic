@@ -17,6 +17,7 @@ type Props = {
   currentAgent?: AgentType;
   chatVisible?: boolean;
   isDeveloper?: boolean;
+  curItemIndex?: number;
   integrateSystem?: string;
   isSimpleMode?: boolean;
   isDebugMode?: boolean;
@@ -39,6 +40,7 @@ const MessageContainer: React.FC<Props> = ({
   currentAgent,
   chatVisible,
   isDeveloper,
+  curItemIndex,
   integrateSystem,
   isSimpleMode,
   isDebugMode,
@@ -121,10 +123,10 @@ const MessageContainer: React.FC<Props> = ({
                     onSendMsg={onSendMsg}
                     onCouldNotAnswer={onCouldNotAnswer}
                     isLastMessage={index === messageList.length - 1}
+                    curItemIndex={index}
                   />
                 </>
               )}
-              {/* {<audio className={`voiceReportPlayer voicePlayer${msgId}`} />} */}
             </div>
           );
         })}

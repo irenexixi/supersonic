@@ -131,6 +131,8 @@ const MessageContainer: React.FC<Props> = ({
           );
         })}
       </div>
+      <audio className={`voiceReportPlayer`} preload="true" style={{ width: 0, height: 0, position: 'absolute'}}></audio>
+      <audio className={`cacheVoiceReportPlayer`} preload="true" style={{ width: 0, height: 0, position: 'absolute'}}></audio>
     </div>
   );
 };

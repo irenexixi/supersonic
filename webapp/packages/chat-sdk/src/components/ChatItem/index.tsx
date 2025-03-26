@@ -470,65 +470,19 @@ const ChatItem: React.FC<Props> = ({
   }, [globalState.canSendMsg]);
 
   
-  const createAudio = function() {
-    const date = new Date().getMinutes()
-    // 56789分钟为audio播放，01234为video播放
-    if (date % 10 > 4) {
-      localStorage.setItem('playerType', 'audio')
-    } else {
-      localStorage.setItem('playerType', 'video')
-    }
-    // 'audio' 'video'
-    // playerType设置为video 使用video标签播放, 其余都是audio标签
-    // error设置为false 不addEventListener error事件
-    localStorage.setItem('error', '')
-    // ended设置为false 不addEventListener ended事件
-    localStorage.setItem('ended', '')
-    // play设置为false 不addEventListener play事件
-    localStorage.setItem('play', '')
-    const type = localStorage.getItem('playerType')
-    if (type === 'video') { 
-      const videoNew = document.createElement('video');
-      videoNew.className = 'voiceReportPlayer';
-      videoNew.setAttribute('preload', 'auto');
-      videoNew.style.width = '0';
-      videoNew.style.height = '0';
-      videoNew.style.position = 'absolute';
-      const videoParentDiv = document.getElementById('messageContainer');
-      videoParentDiv && videoParentDiv.appendChild(videoNew);
-    } else {
-      const audioNew = document.createElement('audio');
-      audioNew.className = 'voiceReportPlayer';
-      audioNew.setAttribute('preload', 'auto');
-      audioNew.style.width = '0';
-      audioNew.style.height = '0';
-      audioNew.style.position = 'absolute';
-      const parentDiv = document.getElementById('messageContainer');
-      parentDiv && parentDiv.appendChild(audioNew);
-    }
-
-  }
-  // 使用useEffect钩子在组件加载后操作DOM
   useEffect(() => {
-    const audioDom = document.getElementsByClassName('voiceReportPlayer')[0];
-    console.log( window.location, ' window.location window.location window.location window.location')
-    if (!audioDom) {
-      console.log('创建audio元素')
-      createAudio();
-      // createAudio();
-    }
+    const audioDom1 = document.getElementsByClassName('voiceReportPlayer')[0];
+    const audioDom2 = document.getElementsByClassName('cacheVoiceReportPlayer')[0];
+    console.log(audioDom1, audioDom2, 'aaaaaaaaaaaaaaaaaaaaaaaaaaaa')
+    
   }, []); // 空数组作为依赖项，表示这个effect只在组件挂载和卸载时执行一次
 
-  const times = useRef(0)
   const voiceReport = (msgData: any = {}) => {
     setVoiceLoading(true)
     const voicePlay = function(msgData: any = {}) {
       const audioElementCur = document.getElementsByClassName('voiceReportPlayer');
       // iconList拿到正在播放的voice
       const iconList = document.getElementsByClassName(`voice-icon`)
-      if (audioElementCur.length === 0) {
-        return
-      }
       // 有正在播放的,停止播放并且清除样式,且不再继续执行
       if (iconList.length > 0) {
           // @ts-ignore
@@ -536,7 +490,6 @@ const ChatItem: React.FC<Props> = ({
           iconList[0]?.classList.remove('voice-icon')
           // @ts-ignore
           if (audioElementCur[0].dataset.index === `${msgData.queryId}`) {
-            // setExportLoading(false);
             setTimeout(() => {
               setVoiceLoading(false)
             }, 100)
@@ -550,7 +503,6 @@ const ChatItem: React.FC<Props> = ({
           // 延迟关闭loading效果，delay时间视作加载语音耗时
           setVoiceLoading(false)
         }, 1000)
-        // @ts-ignore
         const audioElement = document.getElementsByClassName('voiceReportPlayer')[0];
         const voicingIcon = document.getElementsByClassName(`voice-icon-${msgData.queryId}`)[0];
         // @ts-ignore
@@ -564,76 +516,10 @@ const ChatItem: React.FC<Props> = ({
           voicingIcon.classList.add('voice-icon')
           // @ts-ignore
           audioElement.dataset.index = msgData.queryId
-          
-          const handleEndedWrapper = function() {
-            // console.log('handleEndedWrapperhandleEndedWrapperhandleEndedWrapper', `${res.data}`.slice(-50))
-            handleEnded(voicingIcon, audioElement)
-          }
-          const handleEnded = function(icon, audio) {
-            // @ts-ignore
-            icon?.classList?.remove('voice-icon')
-            audio.dataset.index = ''
-            // @ts-ignore
-            // console.log('ended: ' + audioElement.currentTime, audioElement.duration);
-          }
-          let isFirstPlay = true
-          const fetchBlob = async () => {
-            // console.log('fetchBlobfetchBlobfetchBlobfetchBlobfetchBlob', `${res.data}`.slice(-50))
-            if(!isFirstPlay){
-              isFirstPlay = false
-              // @ts-ignore
-              audioElement.pause()
-              const fullResponse = await fetch(res.data)
-              const blob = await fullResponse.blob()
-              const audio = await URL.createObjectURL(blob)
-              // @ts-ignore
-              audioElement.src = audio
-              // @ts-ignore
-              audioElement.play()
-            }
-          }
-          let attempts = 0;
-          const getAudioError = function() {
-            // console.log('getAudioErrorgetAudioErrorgetAudioErrorgetAudioErrorgetAudioError', `${res.data}`.slice(-50))
-            if (attempts++ < 6) {
-              // @ts-ignore
-              audioElement.load()
-              setTimeout(() => {
-                // @ts-ignore
-                audioElement.play()
-              }, 1000)
-            }
-          }
-          times.current++
-          console.log(times.current, 'times.current')
-          // audioElement.removeEventListener('play', fetchBlob)
-          const ended = localStorage.getItem('ended')
-          const play = localStorage.getItem('play')
-          const error = localStorage.getItem('error')
-          if (play !== 'false') {
-            audioElement.addEventListener('play', fetchBlob)
-          }
-          // audioElement.removeEventListener('error', getAudioError)
-          if (error !== 'false') {
-            audioElement.addEventListener('error', getAudioError)
-          }
-          // audioElement.removeEventListener('ended', handleEndedWrapper)
-          if (ended !== 'false') {
-            audioElement.addEventListener('ended', handleEndedWrapper)
-          }
         }
       }
     }
-    const audioPlayer = document.getElementsByClassName('voiceReportPlayer')[0];
-    if (!audioPlayer) {
-      console.log('audio未成功创建，播放异常。')
-      createAudio();
-      setTimeout(() => {
-        voicePlay(msgData)
-      }, 1000)
-    } else {
-      voicePlay(msgData)
-    }
+    voicePlay(msgData)
   }
   const onSwitchEntity = async (entityId: string) => {
     setEntitySwitchLoading(true);

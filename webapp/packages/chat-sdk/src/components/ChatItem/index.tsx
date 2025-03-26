@@ -534,6 +534,15 @@ const ChatItem: React.FC<Props> = ({
           voicingIcon.classList.add('voice-icon')
           // @ts-ignore
           audioElement.dataset.index = msgData.queryId
+          const handleEndedWrapper = function() {
+            handleEnded(voicingIcon, audioElement)
+          }
+          const handleEnded = function(icon, audio) {
+            // @ts-ignore
+            icon?.classList?.remove('voice-icon')
+            audio.dataset.index = ''
+          }
+          audioElement.addEventListener('ended', handleEndedWrapper)
         }
       }
     }

@@ -97,6 +97,7 @@ const MessageContainer: React.FC<Props> = ({
   }, [voiceLoading]);
   // 从Tools中触发点击事件传递到ChatItem在从ChatItem中触发MessageContainer的voiceReport函数
   const voiceReport = (msgData: any = {}) => {
+    sessionStorage.setItem('voiceReportQueryId', JSON.stringify(msgData.queryId))
     setVoiceLoading(true)
     const voicePlay = function(msgData: any = {}) {
       const audioElementCur = document.getElementsByClassName('voiceReportPlayer');
@@ -124,6 +125,8 @@ const MessageContainer: React.FC<Props> = ({
         // }, 1000)
         const audioElement = document.getElementsByClassName('voiceReportPlayer')[0];
         const voicingIcon = document.getElementsByClassName(`voice-icon-${msgData.queryId}`)[0];
+        // 查到对应的voicingIcon
+        console.log(voicingIcon, 'voicingIcon')
         // @ts-ignore
         if (audioElement && voicingIcon) {
           // @ts-ignore
@@ -163,44 +166,47 @@ const MessageContainer: React.FC<Props> = ({
             showTip && message.success('即将为您播报语音');
             // 延迟关闭loading效果，delay时间视作加载语音耗时
             setVoiceLoading(false)
+            const voicingIcon = document.getElementsByClassName(`voice-icon-${msgData.queryId}`)[0];
             voicingIcon.classList.add('voice-icon')
             // @ts-ignore
             audioElement.play().catch(e => {
               setVoiceLoading(true)
-              showTip && message.error('自动播放失败，需要用户交互');
-              console.error("redChat 自动播放失败，需要用户交互:", e);
+              showTip && message.error('播放失败，3S后将自动播放');
+              console.error("redChat 播放失败，3S后将自动播放:", e);
+              const voicingIcon = document.getElementsByClassName(`voice-icon-${msgData.queryId}`)[0];
               voicingIcon.classList.remove('voice-icon')
-              // 提示用户点击页面以播放
-              // document.body.addEventListener("click", () => {
-              //     // @ts-ignore
-              //     audioElement.play() 
-              //   }, { once: true });
               setTimeout(() => {
+                const voicingIcon = document.getElementsByClassName(`voice-icon-${msgData.queryId}`)[0];
                 voicingIcon.classList.add('voice-icon')
                 // @ts-ignore
                 audioElement.play().catch(e => {
-                  showTip && message.error('自动播放失败，需要用户交互');
-                  console.error("redChat 自动播放失败，需要用户交互:", e);
+                  showTip && message.error('播放失败，3S后将自动播放');
+                  console.error("redChat 播放失败，3S后将自动播放:", e);
+                  const voicingIcon = document.getElementsByClassName(`voice-icon-${msgData.queryId}`)[0];
                   voicingIcon.classList.remove('voice-icon')
                   setTimeout(() => {
+                    const voicingIcon = document.getElementsByClassName(`voice-icon-${msgData.queryId}`)[0];
                     voicingIcon.classList.add('voice-icon')
                     // @ts-ignore
                     audioElement.play().catch(e => {
-                      showTip && message.error('自动播放失败，需要用户交互');
-                      console.error("redChat 自动播放失败，需要用户交互:", e);
+                      showTip && message.error('播放失败，获取文件异常,可重新点击播放');
+                      alert('播放失败，获取文件异常,可重新点击播放')
+                      console.error("redChat 播放失败，获取文件异常,可重新点击播放:", e);
+                      const voicingIcon = document.getElementsByClassName(`voice-icon-${msgData.queryId}`)[0];
                       voicingIcon.classList.remove('voice-icon')
                     });
-                  }, 2000)
+                  }, 3000)
                 });
-              }, 2000)
+              }, 3000)
             });
-          });
+          }, { once: true });
           // 错误处理
           audioElement.addEventListener("error", () => {
             showTip && message.error('音频文件生成中，请稍后再试');
             setVoiceLoading(false)
-          }); 
+          }, { once: true });
           const handleEndedWrapper = function() {
+            const voicingIcon = document.getElementsByClassName(`voice-icon-${msgData.queryId}`)[0];
             handleEnded(voicingIcon, audioElement)
           }
           const handleEnded = function(icon, audio) {
@@ -208,7 +214,7 @@ const MessageContainer: React.FC<Props> = ({
             icon?.classList?.remove('voice-icon')
             audio.dataset.index = ''
           }
-          audioElement.addEventListener('ended', handleEndedWrapper)
+          audioElement.addEventListener('ended', handleEndedWrapper, { once: true });
         }
       }
     }

@@ -110,6 +110,7 @@ const ChatItem: React.FC<Props> = ({
   const [executeLoading, setExecuteLoading] = useState(false);
   const [executeTip, setExecuteTip] = useState('');
   const [executeErrorMsg, setExecuteErrorMsg] = useState('');
+  const [voiceLoading, setVoiceLoading] = useState(false);
   const [data, setData] = useState<MsgDataType>();
   const [entitySwitchLoading, setEntitySwitchLoading] = useState(false);
   const [dimensionFilters, setDimensionFilters] = useState<FilterItemType[]>([]);
@@ -475,6 +476,14 @@ const ChatItem: React.FC<Props> = ({
     canSendMsgRef.current = globalState.canSendMsg;
   }, [globalState.canSendMsg]);
 
+  useEffect(() => {
+    // 当data变化时，这个函数会被调用
+    // handleDataChange(data);
+    // setExportLoading(itemVoiceLoading);
+    if (`${msgData?.queryId}` === sessionStorage.getItem('voiceReportQueryId')) {
+      setVoiceLoading(itemVoiceLoading || false)
+    }
+  }, [itemVoiceLoading]);
   const voiceReport = (msgData: any = {}) => {
     if (onVoiceReport) {
       onVoiceReport?.(msgData)
@@ -870,7 +879,7 @@ const ChatItem: React.FC<Props> = ({
             scoreValue={score}
             isParserError={isParserError}
             msgData={msgData}
-            voiceLoading={itemVoiceLoading}
+            voiceLoading={voiceLoading}
             onExportData={() => {
               onExportData();
             }}

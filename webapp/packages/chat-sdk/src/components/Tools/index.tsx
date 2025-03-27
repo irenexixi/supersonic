@@ -314,7 +314,7 @@ const Tools: React.FC<Props> = ({
                     // }, 3000);
                   }}
                   type="text"
-                  loading={exportLoading}
+                  loading={`${msgData?.queryId}` === sessionStorage.getItem('voiceReportQueryId') ? exportLoading : false}
                 >
                   <SoundOutlined className={`voice-icon-${msgData.queryId} voice-icon-default`} />
                   {/* <span className={`${prefixCls}-font-style`}>语音播放</span> */}

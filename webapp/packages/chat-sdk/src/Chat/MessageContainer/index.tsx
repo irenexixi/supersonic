@@ -99,6 +99,7 @@ const MessageContainer: React.FC<Props> = ({
   const voiceReport = (msgData: any = {}) => {
     sessionStorage.setItem('voiceReportQueryId', JSON.stringify(msgData.queryId))
     setVoiceLoading(true)
+    console.clear()
     const voicePlay = function(msgData: any = {}) {
       const audioElementCur = document.getElementsByClassName('voiceReportPlayer');
       // iconList拿到正在播放的voice
@@ -119,6 +120,13 @@ const MessageContainer: React.FC<Props> = ({
       const urlNew = msgData.ttsUrl.replace('dc.migu.cn', 'da.migu.cn:8443')
       const res = {data: urlNew}
       if (res && res.data) {
+        const oaAccount = localStorage.getItem('oaAccount');
+        const accountList = ['liqianqianjs', 'liqianqian', 'jiangjiqi', 'jiangjiqipt', 'liaokun', 'liaokun_pt']
+        let showTip = false
+        // @ts-ignore
+        if (accountList.indexOf(oaAccount) > -1) {
+          showTip = true
+        }
         // setTimeout(() => {
           // 延迟关闭loading效果，delay时间视作加载语音耗时
           // setVoiceLoading(false)
@@ -137,6 +145,28 @@ const MessageContainer: React.FC<Props> = ({
           // @ts-ignore
           audioElement.dataset.index = msgData.queryId
         }
+        const retryPlayVoice = function() {
+          setTimeout(() => {
+            console.warn('start' + 7)
+            // @ts-ignore
+            audioElement.src = urlNew
+            // @ts-ignore
+            audioElement.play().then(() => {
+              console.warn('start' + 8)
+              // 成功播放,开启播放效果并且关闭loading效果
+              setVoiceLoading(false)
+              activeAnimation()
+            }).catch(e => {
+              console.warn('start' + 9)
+              showTip && message.error('播放失败，获取文件异常,可重新点击播放');
+              alert('播放失败，获取文件异常,可重新点击播放')
+              console.error("redChat 播放失败，获取文件异常,可重新点击播放:", e);
+              // 最后一次重试并且播放失败,关闭loading效果 并且关闭 播放效果
+              setVoiceLoading(false)
+              closeAnimation()
+            });
+          }, 6000)
+        }
         const audioElement = document.getElementsByClassName('voiceReportPlayer')[0];
         const voicingIcon = document.getElementsByClassName(`voice-icon-${msgData.queryId}`)[0];
         // 查到对应的voicingIcon
@@ -149,48 +179,60 @@ const MessageContainer: React.FC<Props> = ({
           audioElement.load()
           // @ts-ignore
           audioElement.dataset.index = msgData.queryId
-          // 监听 'canplaythrough' 事件（表示可以完整播放）
-          const oaAccount = localStorage.getItem('oaAccount');
-          const accountList = ['liqianqianjs', 'liqianqian', 'jiangjiqi', 'jiangjiqipt', 'liaokun', 'liaokun_pt']
-          let showTip = false
-          // @ts-ignore
-          if (accountList.indexOf(oaAccount) > -1) {
-            showTip = true
-          }
-          audioElement.addEventListener("canplaythrough", () => {
+          // 监听 'canplaythrough' 事件（表示可以完整播放)
+          console.warn('start test')
+          audioElement.addEventListener('canplaythrough', () => {
             console.log("redChat canplaythrough 音频已完全加载，开始播放");
-            showTip && message.success('即将为您播报语音');
+            showTip && message.success('即将为您播报语音,线上版本为' + 11111);
+            console.warn('start' + 1)
             // 可以播放了
+            const audioElement = document.getElementsByClassName('voiceReportPlayer')[0];
+            // @ts-ignore
+            // audioElement.src = 'jiadeshuju,能触发play().catch吗.MP3'
+            // @ts-ignore
+            audioElement.src = res.data
+            // @ts-ignore
+            audioElement.load()
             // @ts-ignore
             audioElement.play().then(() => {
+              console.warn('start' + 2)
               // 成功播放,开启播放效果并且关闭loading效果
               setVoiceLoading(false)
               activeAnimation()
             }).catch(e => {
+              console.warn('start' + 3)
               // 播放失败,开启loading效果 并且关闭 播放效果
               setVoiceLoading(true)
               showTip && message.error('播放失败，3S后将自动播放');
               console.error("redChat 播放失败，3S后将自动播放:", e);
               closeAnimation()
               setTimeout(() => {
+                console.warn('start' + 4)
                 // @ts-ignore
                 audioElement.play().then(() => {
+                  console.warn('start' + 5)
                   // 成功播放,开启播放效果并且关闭loading效果
                   activeAnimation()
                   setVoiceLoading(false)
                 }).catch(e => {
+                  console.warn('start' + 6)
                   showTip && message.error('播放失败，3S后将自动播放');
                   console.error("redChat 播放失败，3S后将自动播放:", e);
                   // 播放失败,开启loading效果 并且关闭 播放效果
                   setVoiceLoading(true)
                   closeAnimation()
                   setTimeout(() => {
+                    console.warn('start' + 7)
+                    // @ts-ignore
+                    audioElement.src = urlNew
                     // @ts-ignore
                     audioElement.play().then(() => {
+                      console.warn('start' + 8)
                       // 成功播放,开启播放效果并且关闭loading效果
                       setVoiceLoading(false)
                       activeAnimation()
                     }).catch(e => {
+                      console.warn('start' + 9)
                       showTip && message.error('播放失败，获取文件异常,可重新点击播放');
                       alert('播放失败，获取文件异常,可重新点击播放')
                       console.error("redChat 播放失败，获取文件异常,可重新点击播放:", e);
@@ -200,46 +242,67 @@ const MessageContainer: React.FC<Props> = ({
                     });
                   }, 6000)
                 });
-              }, 3000)
+              }, 4000)
             });
           }, { once: true });
           // 错误处理
-          audioElement.addEventListener("error", () => {
-            showTip && message.error('音频文件生成中，请稍后再试');
+          audioElement.addEventListener('error', () => {
+            showTip && message.error('音频文件生成中，请稍后再试,线上版本为' + 11111);
             // 报错了,关闭播放效果,打开loading效果
             closeAnimation()
             setVoiceLoading(true)
+            console.warn('start' + 101)
+            // 报错了,等待三秒后 重新load(), 4S后继续播放
             setTimeout(() => {
+              console.warn('start' + 102)
+              const audioElement = document.getElementsByClassName('voiceReportPlayer')[0];
+              // @ts-ignore
+              audioElement.src = res.data
+              // @ts-ignore
+              audioElement.load()
+            }, 4000)
+            setTimeout(() => {
+              console.warn('start' + 103)
               // @ts-ignore
               audioElement.play().then(() => {
                 // 成功播放,开启播放效果并且关闭loading效果
                 activeAnimation()
                 setVoiceLoading(false)
+                console.warn('start' + 104)
               }).catch(e => {
                 showTip && message.error('播放失败，3S后将自动播放');
                 console.error("redChat 播放失败，3S后将自动播放:", e);
                 // 播放报错,关闭播放效果,打开loading效果
                 setVoiceLoading(true)
                 closeAnimation()
+                console.warn('start' + 105)
                 setTimeout(() => {
+                  console.warn('start' + 106)
                   // @ts-ignore
                   audioElement.play().then(() => {
                     // 成功播放,开启播放效果并且关闭loading效果
                     activeAnimation()
                     setVoiceLoading(false)
+                    console.warn('start' + 107)
                   }).catch(e => {
                     showTip && message.error('播放失败，3S后将自动播放');
                     console.error("redChat 播放失败，3S后将自动播放:", e);
                     // 播放报错,关闭播放效果,打开loading效果
                     setVoiceLoading(true)
                     closeAnimation()
+                    console.warn('start' + 108)
                     setTimeout(() => {
+                      console.warn('start' + 109)
+                      // @ts-ignore
+                      audioElement.load()
                       // @ts-ignore
                       audioElement.play().then(() => {
+                        console.warn('start' + 110)
                         // 成功播放,开启播放效果并且关闭loading效果
                         activeAnimation()
                         setVoiceLoading(false)
                       }).catch(e => {
+                        console.warn('start' + 111)
                         showTip && message.error('播放失败，获取文件异常,可重新点击播放');
                         alert('播放失败，获取文件异常,可重新点击播放')
                         console.error("redChat 播放失败，获取文件异常,可重新点击播放:", e);
@@ -249,9 +312,9 @@ const MessageContainer: React.FC<Props> = ({
                       });
                     }, 8000)
                   });
-                }, 5000)
+                }, 4000)
               });
-            }, 3000)
+            }, 6000)
           }, { once: true });
           audioElement.addEventListener('ended', closeAnimation, { once: true });
         }

@@ -477,9 +477,6 @@ const ChatItem: React.FC<Props> = ({
   }, [globalState.canSendMsg]);
 
   useEffect(() => {
-    // 当data变化时，这个函数会被调用
-    // handleDataChange(data);
-    // setExportLoading(itemVoiceLoading);
     if (`${msgData?.queryId}` === sessionStorage.getItem('voiceReportQueryId')) {
       setVoiceLoading(itemVoiceLoading || false)
     }
@@ -487,116 +484,7 @@ const ChatItem: React.FC<Props> = ({
   const voiceReport = (msgData: any = {}) => {
     if (onVoiceReport) {
       onVoiceReport?.(msgData)
-      return
     }
-    // setItemVoiceLoading(true)
-    // const voicePlay = function(msgData: any = {}) {
-    //   const audioElementCur = document.getElementsByClassName('voiceReportPlayer');
-    //   // iconList拿到正在播放的voice
-    //   const iconList = document.getElementsByClassName(`voice-icon`)
-    //   // 有正在播放的,停止播放并且清除样式,且不再继续执行
-    //   if (iconList.length > 0) {
-    //       // @ts-ignore
-    //       audioElementCur[0].pause()
-    //       iconList[0]?.classList.remove('voice-icon')
-    //       // @ts-ignore
-    //       if (audioElementCur[0].dataset.index === `${msgData.queryId}`) {
-    //         setTimeout(() => {
-    //           setItemVoiceLoading(false)
-    //         }, 100)
-    //         return
-    //       }
-    //   }
-    //   const urlNew = msgData.ttsUrl.replace('dc.migu.cn', 'da.migu.cn:8443')
-    //   const res = {data: urlNew}
-    //   if (res && res.data) {
-    //     // setTimeout(() => {
-    //       // 延迟关闭loading效果，delay时间视作加载语音耗时
-    //       // setItemVoiceLoading(false)
-    //     // }, 1000)
-    //     const audioElement = document.getElementsByClassName('voiceReportPlayer')[0];
-    //     const voicingIcon = document.getElementsByClassName(`voice-icon-${msgData.queryId}`)[0];
-    //     // @ts-ignore
-    //     if (audioElement && voicingIcon) {
-    //       // @ts-ignore
-    //       audioElement.src = res.data
-    //       // @ts-ignore
-    //       audioElement.load()
-    //       // @ts-ignore
-    //       // audioElement.play();
-    //       // voicingIcon.classList.add('voice-icon')
-    //       // @ts-ignore
-    //       audioElement.dataset.index = msgData.queryId
-    //       // 检测是否完全加载
-    //       // @ts-ignore
-    //       // function checkIfFullyLoaded() {
-    //       //   // @ts-ignore
-    //       //   if (audioElement.readyState >= 4) { // HAVE_ENOUGH_DATA
-    //       //     console.log("redChat loadedmetadata 音频完全加载");
-    //       //     // @ts-ignore
-    //       //     audioElement.play().catch(e => console.error("redChat 播放失败:", e));
-    //       //   } else {
-    //       //     setTimeout(checkIfFullyLoaded, 500); // 每隔 500ms 检查一次
-    //       //   }
-    //       // }
-    //       // audioElement.addEventListener("loadedmetadata", () => {
-    //       //   checkIfFullyLoaded(); // 开始检查
-    //       // });
-    //       // 监听 'canplaythrough' 事件（表示可以完整播放）
-    //       const oaAccount = localStorage.getItem('oaAccount');
-    //       const accountList = ['liqianqianjs', 'liqianqian', 'jiangjiqi', 'jiangjiqi_pt', 'liaokun', 'liaokun_pt']
-    //       let showTip = false
-    //       // @ts-ignore
-    //       if (accountList.indexOf(oaAccount) > -1) {
-    //         showTip = true
-    //       }
-    //       audioElement.addEventListener("canplaythrough", () => {
-    //         console.log("redChat canplaythrough 音频已完全加载，开始播放");
-    //         showTip && message.success('即将为您播报语音');
-    //         // 延迟关闭loading效果，delay时间视作加载语音耗时
-    //         setItemVoiceLoading(false)
-    //         voicingIcon.classList.add('voice-icon')
-    //         // @ts-ignore
-    //         audioElement.play().catch(e => {
-    //           showTip && message.error('自动播放失败，需要用户交互');
-    //           console.error("redChat 自动播放失败，需要用户交互:", e);
-    //           voicingIcon.classList.remove('voice-icon')
-    //           // 提示用户点击页面以播放
-    //           document.body.addEventListener("click", () => {
-    //               // @ts-ignore
-    //               audioElement.play() 
-    //             }, { once: true });
-    //         });
-    //       });
-
-    //       // 错误处理
-    //       audioElement.addEventListener("error", () => {
-    //         showTip && message.error('音频文件生成中，请稍后再试');
-    //         setItemVoiceLoading(false)
-    //       }); 
-
-    //       const handleEndedWrapper = function() {
-    //         handleEnded(voicingIcon, audioElement)
-    //       }
-    //       const handleEnded = function(icon, audio) {
-    //         // @ts-ignore
-    //         icon?.classList?.remove('voice-icon')
-    //         audio.dataset.index = ''
-    //       }
-    //       audioElement.addEventListener('ended', handleEndedWrapper)
-    //     }
-    //   }
-    // }
-    // // 延迟3000ms播放,安卓加载异常问题尝试修复
-    // // 暂停播放时不延迟
-    // const iconList = document.getElementsByClassName(`voice-icon`)
-    // if (iconList.length > 0) {
-    //   voicePlay(msgData)
-    // } else {
-    //   setTimeout(() => {
-    //     voicePlay(msgData)
-    //   }, 3000)
-    // }
   }
   const onSwitchEntity = async (entityId: string) => {
     setEntitySwitchLoading(true);

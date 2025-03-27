@@ -325,11 +325,11 @@ const Tools: React.FC<Props> = ({
                   <Button
                     size="small"
                     onClick={() => {
-                      setExportLoading(true);
+                      // setExportLoading(true);
                       onExportData?.();
-                      setTimeout(() => {
-                        setExportLoading(false);
-                      }, 1000);
+                      // setTimeout(() => {
+                      //   setExportLoading(false);
+                      // }, 1000);
                     }}
                     type="text"
                     loading={exportLoading}

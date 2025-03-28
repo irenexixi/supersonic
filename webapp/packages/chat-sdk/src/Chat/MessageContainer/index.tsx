@@ -72,25 +72,8 @@ const MessageContainer: React.FC<Props> = ({
   
   useEffect(() => {
     const audioDom1 = document.getElementsByClassName('voiceReportPlayer')[0];
-    const audioDom2 = document.getElementsByClassName('cacheVoiceReportPlayer')[0];
-    console.log(audioDom1, audioDom2, 'aaaaaaaaaaaaaaaaaaaaaaaaaaaa')
   }, []); // 空数组作为依赖项，表示这个effect只在组件挂载和卸载时执行一次
 
-  const cacheVoiceData = function(ttsUrl: string) {
-    const audioElementCache = document.getElementsByClassName('cacheVoiceReportPlayer')[0]
-    // @ts-ignore
-    audioElementCache.src = ttsUrl
-    // @ts-ignore
-    audioElementCache.load()
-    setTimeout(() => {
-      // @ts-ignore
-      audioElementCache.load()
-    }, 1000)
-    setTimeout(() => {
-      // @ts-ignore
-      audioElementCache.load()
-    }, 2000)
-  }
   useEffect(() => {
     // 当data变化时，这个函数会被调用
     setVoiceLoading(voiceLoading);
@@ -249,7 +232,6 @@ const MessageContainer: React.FC<Props> = ({
         })}
       </div>
       <audio className={`voiceReportPlayer`} style={{ width: 0, height: 0, position: 'absolute'}}></audio>
-      <audio className={`cacheVoiceReportPlayer`} style={{ width: 0, height: 0, position: 'absolute'}}></audio>
     </div>
   );
 };

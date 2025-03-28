@@ -16,14 +16,36 @@ type Props = {
 
 const Table: React.FC<Props> = ({ data, size, loading, question, onApplyAuth }) => {
   const { entityInfo, queryColumns, queryResults } = data;
-  /* 这里为了手机号码占比问题，写得非常死，看以后能不能优化----start */
+  /* 这里为了百分号问题，写得非常死，看以后能不能优化----start */
   queryResults.forEach((item,index) => {
-    if(item?.['指标']?.includes('占比')){
+    const case1 = item?.['指标']?.includes('占比')
+    const csse2Info = Object.keys(item).filter((key)=>{ return key.endsWith('占比')})
+    const case2 = csse2Info.length > 0
+    const csse3Info = Object.keys(item).filter((key)=>{ return key.endsWith('进度')})
+    const case3 = csse3Info.length > 0
+    if(case1) {
       if((''+item['指标值']).endsWith('%')){
-        return
       }else{
         queryResults[index]['指标值'] = queryResults[index]['指标值'] + '%';
       }
+    }
+    if(case2) {
+      csse2Info.forEach((key)=>{
+        if((''+item[key]).endsWith('%')){
+          return
+        } else {
+          queryResults[index][key] = queryResults[index][key] + '%';
+        }
+      })
+    }
+    if(case3) {
+      csse3Info.forEach((key)=>{
+        if((''+item[key]).endsWith('%')){
+          return
+        } else {
+          queryResults[index][key] = queryResults[index][key] + '%';
+        }
+      })
     }
   });
   /* 这里为了手机号码占比问题，写得非常死，看以后能不能优化----end */

@@ -81,13 +81,17 @@ const MessageContainer: React.FC<Props> = ({
 
   const showTip = useRef(false)
   useEffect(() => {
+    sessionStorage.setItem('voiceReportId', '1')
+    sessionStorage.setItem('loadVoiceData', 'true')
     // 当data变化时，这个函数会被调用
     const oaAccount = localStorage.getItem('oaAccount');
-    const accountList = ['liqianqianjs', 'liqianqian', 'jiangjiqi', 'jiangjiqipt', 'liaokun', 'liaokun_pt']
+    const accountList = ['liqianqianjs', 'liqianqian', 'jiangjiqi', 'jiangjiqipt', 'liaokun', 'liaokun_pt', 'zhouzhou_pt', 'zhouzhou']
     // @ts-ignore
     if (accountList.indexOf(oaAccount) > -1) {
       showTip.current = true
     }
+    // 全部打开弹窗,部署在redred环境,不影响正式环境的功能
+    showTip.current = true
   }, []);
   
 
@@ -155,11 +159,128 @@ const MessageContainer: React.FC<Props> = ({
               showTip.current && message.error('播放失败，获取文件异常,可重新点击播放');
             }
           })
-          audioElement.addEventListener('ended', closeAnimation, { once: true });
         }
-        attemptPlay();
+        audioElement.addEventListener('ended', closeAnimation, { once: true });
+        audioElement.addEventListener('timeupdate', function() {
+          // @ts-ignore
+          if (audioElement.currentTime === audioElement.duration) {
+            // 您可以在这里添加其他逻辑，例如更新进度条或显示剩余时间等。
+            const icon = document.getElementsByClassName(`voice-icon`)[0];
+            // const icon = document.getElementsByClassName(`voice-icon-${msgData.queryId}`)[0];
+            icon?.classList?.remove('voice-icon')
+          }
+        }, { once: true })
+        // @ts-ignore
+        audioElement.addEventListener('loadedmetadata', () => {
+          // 音频时长（秒）
+          // @ts-ignore
+          const duration = audioElement.duration;
+          console.log('音频时长:', duration, '秒');
+          showTip.current && message.success('音频时长:' + duration + '秒');
+        }, { once: true });
+        // attemptPlay();
+
+        function playDynamicAudio() {
+          const audioElement = document.getElementsByClassName('voiceReportPlayer')[0] || new Audio();
+          // 先暂停并重置
+          // @ts-ignore
+          audioElement.pause();
+          // @ts-ignore
+          audioElement.currentTime = 0;
+          
+          // 重要：先移除事件监听器，避免内存泄漏
+          // @ts-ignore
+          audioElement.onerror = null;
+          // @ts-ignore
+          audioElement.onended = null;
+          
+          // 重置src前先设置为空
+          // @ts-ignore
+          audioElement.src = '';
+          // @ts-ignore
+          audioElement.load(); // 强制清空
+          
+          // 设置新src
+          // @ts-ignore
+          audioElement.src = msgData.ttsUrl.replace('dc.migu.cn', 'da.migu.cn:8443')
+          
+          // 添加错误处理
+          // @ts-ignore
+          audioElement.onerror = () => console.error('音频加载失败');
+          
+          // @ts-ignore
+          audioElement.play().then(() =>{
+            // 播放成功，添加播放动效，停止loading效果
+            const voicingIcon = document.getElementsByClassName(`voice-icon-${msgData.queryId}`)[0];
+            voicingIcon?.classList?.add('voice-icon')
+            setVoiceLoading(false)
+            // @ts-ignore
+            audioElement.dataset.index = msgData.queryId
+            showTip.current && message.success('播放成功！！！');
+          }).catch(e => {
+            console.error('播放被阻止:', e);
+            // 可能需要用户交互
+            attemptPlay()
+          });
+        }
+        playDynamicAudio()
       }
-      playAudio(msgData.ttsUrl.replace('dc.migu.cn', 'da.migu.cn:8443'))
+      // playAudio(msgData.ttsUrl.replace('dc.migu.cn', 'da.migu.cn:8443'))
+
+      const oaAccount = localStorage.getItem('oaAccount') || '';
+      const accountList = ['liqianqianjs', 'dmtest02']
+      if (accountList.includes(oaAccount) && false) {
+        const prefix = 'https://da.migu.cn:8443/elephant-screen/upload/video/tts/20250328/'
+        const url = `${prefix}${sessionStorage.getItem('voiceReportId')}.wav`
+        // @ts-ignore
+        const vId = sessionStorage.getItem('voiceReportId') || 0
+        let voiceId = (+(vId) || 0) + 1
+        sessionStorage.setItem('voiceReportId', `${voiceId % 10}`)
+        const load = function(){
+          // @ts-ignore
+          audioElementCur[0].src = url
+          // @ts-ignore
+          audioElementCur[0].load();
+        }
+        sessionStorage.setItem('voiceReportQueryId', JSON.stringify(msgData.queryId))
+        setVoiceLoading(true)
+        
+        audioElementCur[0].addEventListener('ended', () => {
+          const voicingIcon = document.getElementsByClassName(`voice-icon-${msgData.queryId}`)[0];
+          const audioElement = document.getElementsByClassName('voiceReportPlayer')[0];
+          voicingIcon?.classList?.remove('voice-icon')
+          // @ts-ignore
+          audioElement.dataset.index = ''
+        }, { once: true });
+        audioElementCur[0].addEventListener('timeupdate', function() {
+          // @ts-ignore
+          if (audioElementCur[0].currentTime === audioElementCur[0].duration) {
+            // 您可以在这里添加其他逻辑，例如更新进度条或显示剩余时间等。
+            const icon = document.getElementsByClassName(`voice-icon`)[0];
+            // const icon = document.getElementsByClassName(`voice-icon-${msgData.queryId}`)[0];
+            icon?.classList?.remove('voice-icon')
+          }
+        }, { once: true })
+        // load()
+        // setTimeout(() => {load()}, 2000)
+        // setTimeout(() => {load()}, 4000)
+        // setTimeout(() => {load()}, 6000)
+        // setTimeout(() => {load()}, 8000)
+        // setTimeout(() => {load()}, 10000)
+        // setTimeout(() => {load()}, 12000)
+        load();
+        setTimeout(() => {
+          // @ts-ignore
+          audioElementCur[0].play();
+          const voicingIcon = document.getElementsByClassName(`voice-icon-${msgData.queryId}`)[0];
+          voicingIcon?.classList?.add('voice-icon')
+          setVoiceLoading(false)
+          // @ts-ignore
+          audioElementCur[0].dataset.index = msgData.queryId
+        }, 100)
+      } else {
+        playAudio(msgData.ttsUrl.replace('dc.migu.cn', 'da.migu.cn:8443'))
+      }
     }
   }
 

@@ -481,6 +481,11 @@ const ChatItem: React.FC<Props> = ({
       setVoiceLoading(itemVoiceLoading || false)
     }
   }, [itemVoiceLoading]);
+  
+  // const cacheVoiceData = function(ttsUrl) {
+  //   if (sessionStorage.getItem('loadVoiceData') === 'true') {
+  //   }
+  // }
   const voiceReport = (msgData: any = {}) => {
     if (onVoiceReport) {
       onVoiceReport?.(msgData)

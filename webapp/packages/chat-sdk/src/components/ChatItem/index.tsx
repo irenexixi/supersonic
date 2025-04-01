@@ -29,7 +29,7 @@ import dayjs, { Dayjs } from 'dayjs';
 import { exportCsvFile } from '../../utils/utils';
 import Loading from './Loading';
 import { useGlobalContext } from '../../context/GlobalContext';
-import { set } from 'lodash';
+
 // import { useMethodRegister } from '../../hooks';
 
 type Props = {

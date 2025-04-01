@@ -3,6 +3,7 @@ import React, { createContext, useState, useContext } from 'react';
 // 定义上下文的值类型，状态为对象
 interface GlobalState {
     canSendMsg: boolean;
+    duringBuildingConversation: boolean;
 }
 
 interface GlobalContextValue {
@@ -17,6 +18,7 @@ const GlobalContext = createContext<GlobalContextValue | undefined>(undefined);
 const GlobalProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [globalState, setGlobalState] = useState<GlobalState>({
         canSendMsg: true,
+        duringBuildingConversation: false
     });
 
     const contextValue: GlobalContextValue = {

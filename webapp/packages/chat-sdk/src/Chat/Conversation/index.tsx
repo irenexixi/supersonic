@@ -15,6 +15,7 @@ import { AgentType, ConversationDetailType } from '../type';
 import { DEFAULT_CONVERSATION_NAME } from '../constants';
 import moment from 'moment';
 import { CloseOutlined, DeleteOutlined, SearchOutlined } from '@ant-design/icons';
+import { useGlobalContext } from '../../context/GlobalContext';
 
 type Props = {
   currentAgent?: AgentType;
@@ -36,6 +37,7 @@ const Conversation: ForwardRefRenderFunction<any, Props> = (
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [editConversation, setEditConversation] = useState<ConversationDetailType>();
   const [searchValue, setSearchValue] = useState('');
+  const { setGlobalState } = useGlobalContext();
 
   useImperativeHandle(ref, () => ({
     updateData,
@@ -43,10 +45,27 @@ const Conversation: ForwardRefRenderFunction<any, Props> = (
   }));
 
   const updateData = async (agentId?: number) => {
-    const { data } = await getAllConversations(agentId || currentAgent!.id);
-    const conversationList = data || [];
-    setConversations(conversationList.slice(0, 200));
-    return conversationList;
+    try {
+      setGlobalState((prev)=>{
+        return {
+          ...prev,
+          duringBuildingConversation: true,
+        }
+      })
+      const { data } = await getAllConversations(agentId || currentAgent!.id);
+      const conversationList = data || [];
+      setConversations(conversationList.slice(0, 200));
+      return conversationList;
+    } catch (err) {
+      
+    } finally {
+      setGlobalState((prev)=>{
+        return {
+          ...prev,
+          duringBuildingConversation: false,
+        }
+      })
+    }
   };
 
   const initData = async () => {
@@ -70,7 +89,24 @@ const Conversation: ForwardRefRenderFunction<any, Props> = (
 
   const addConversation = async (sendMsgParams?: any) => {
     const agentId = sendMsgParams?.agentId || currentAgent!.id;
-    await saveConversation(DEFAULT_CONVERSATION_NAME, agentId);
+    try {
+      setGlobalState((prev)=>{
+        return {
+          ...prev,
+          duringBuildingConversation: true,
+        }
+      })
+      await saveConversation(DEFAULT_CONVERSATION_NAME, agentId);
+    } catch (err) {
+      
+    } finally {
+      setGlobalState((prev)=>{
+        return {
+          ...prev,
+          duringBuildingConversation: false,
+        }
+      })
+    }
     return updateData(agentId);
   };
 

@@ -22,7 +22,7 @@ import { HistoryMsgItemType, MsgDataType, SendMsgParamsType } from '../common/ty
 import { getHistoryMsg } from '../service';
 import ShowCase from '../ShowCase';
 import { jsonParse } from '../utils/utils';
-import { ConfigProvider, Drawer, Modal, Row, Col, Space, Switch, Tooltip, message } from 'antd';
+import { ConfigProvider, Drawer, Modal, Row, Col, Space, Switch, Tooltip, message, Spin } from 'antd';
 import locale from 'antd/locale/zh_CN';
 import dayjs from 'dayjs';
 import 'dayjs/locale/zh-cn';
@@ -437,6 +437,14 @@ const Chat: ForwardRefRenderFunction<any, Props> = (
     return (
       <ConfigProvider locale={locale}>
         {contextHolder}   
+        <Spin fullscreen spinning={globalState.duringBuildingConversation} tip=' 对话创建中...' 
+          style={{ 
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexDirection: 'column',
+          }}
+        />
         <div className={chatClass}>
             <div className={styles.chatSection}>
               {!isMobile && agentList.length > 1 && agentListVisible && (

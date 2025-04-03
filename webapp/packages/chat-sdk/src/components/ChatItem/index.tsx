@@ -712,6 +712,17 @@ const ChatItem: React.FC<Props> = ({
 
         {isThinking && getNodeTip('深度思考中')}
         <div id={'thoughts-response-' + msgId} className='thoughts-container'></div>
+        
+        {dateInfo && (dateInfo.startDate || dateInfo.endDate) &&
+          <div className='data-time'>
+            <span className='part1'>数据时间：</span>
+            <span className='part2'>
+              {dateInfo?.startDate && dateInfo?.endDate && `${dateInfo?.startDate} 至 ${dateInfo?.endDate}`}
+              {dateInfo?.startDate && !dateInfo?.endDate && `${dateInfo?.startDate}`}
+              {!dateInfo?.startDate && dateInfo?.endDate && `${dateInfo?.endDate}`}
+            </span>
+          </div>
+        }
         {executeMode && (
           <Spin spinning={entitySwitchLoading}>
             <div style={{ minHeight: 50 }}>

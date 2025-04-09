@@ -18,7 +18,6 @@ type Props = {
   currentAgent?: AgentType;
   chatVisible?: boolean;
   isDeveloper?: boolean;
-  curItemIndex?: number;
   integrateSystem?: string;
   isSimpleMode?: boolean;
   isDebugMode?: boolean;
@@ -41,7 +40,6 @@ const MessageContainer: React.FC<Props> = ({
   currentAgent,
   chatVisible,
   isDeveloper,
-  curItemIndex,
   integrateSystem,
   isSimpleMode,
   isDebugMode,
@@ -69,220 +67,43 @@ const MessageContainer: React.FC<Props> = ({
     onResize();
   }, [historyVisible, chatVisible]);
 
-  
-  useEffect(() => {
-    const audioDom1 = document.getElementsByClassName('voiceReportPlayer')[0];
-  }, []); // 空数组作为依赖项，表示这个effect只在组件挂载和卸载时执行一次
+  // useEffect(() => {
+  //   // 当data变化时，这个函数会被调用
+  //   setVoiceLoading(voiceLoading);
+  // }, [voiceLoading]);
 
   useEffect(() => {
-    // 当data变化时，这个函数会被调用
-    setVoiceLoading(voiceLoading);
-  }, [voiceLoading]);
-
-  const showTip = useRef(false)
-  useEffect(() => {
-    sessionStorage.setItem('voiceReportId', '1')
-    sessionStorage.setItem('loadVoiceData', 'true')
-    // 当data变化时，这个函数会被调用
-    const oaAccount = localStorage.getItem('oaAccount');
-    const accountList = ['liqianqianjs', 'liqianqian', 'jiangjiqi', 'jiangjiqipt', 'liaokun', 'liaokun_pt', 'zhouzhou_pt', 'zhouzhou']
-    // @ts-ignore
-    if (accountList.indexOf(oaAccount) > -1) {
-      showTip.current = true
-    }
-    // 全部打开弹窗,部署在redred环境,不影响正式环境的功能
-    showTip.current = true
-  }, []);
-  
-
-  // 从Tools中触发点击事件传递到ChatItem在从ChatItem中触发MessageContainer的voiceReport函数
-  const voiceReport = (msgData: any = {}) => {
-    console.clear()
-    const iconList = document.getElementsByClassName(`voice-icon`)
-    const audioElementCur = document.getElementsByClassName('voiceReportPlayer');
-    if (iconList.length > 0) {
-      // 有正在播放的,停止播放并且清除样式
-      // @ts-ignore
-      audioElementCur[0].pause()
-      iconList[0]?.classList.remove('voice-icon')
-      // @ts-ignore
-      if (audioElementCur[0].dataset.index === `${msgData.queryId}`) {
-        setTimeout(() => {
-          setVoiceLoading(false)
-        }, 100)
-      } else {
-        // 如果当前播放和点击的不是同一个，那就播放当前点击的
-        voiceReport(msgData)
-      }
+    // 如果在iframe中，调用语音播放就用父页面的postMessage触发audio的播放,否则用当前项目内的audio播放
+    // 这样做是因为咪咕家访问红海系统内iframe引入的红海经分小助手（chatBI）时，播放音频有兼容性问题。
+    if (window.self !== window.top) {
+      sessionStorage.setItem('isInIframe', 'false')
+      // sessionStorage.setItem('isInIframe', 'true')
     } else {
-      const closeAnimation = function() {
-        const voicingIcon = document.getElementsByClassName(`voice-icon-${msgData.queryId}`)[0];
-        const audioElement = document.getElementsByClassName('voiceReportPlayer')[0];
-        voicingIcon?.classList?.remove('voice-icon')
-        // @ts-ignore
-        audioElement.dataset.index = ''
-      }
-      const playAudio = function(url, retries = 10, delay = 3000) {
-        // 调用播放功能，设置loading和当前播放ID
-        sessionStorage.setItem('voiceReportQueryId', JSON.stringify(msgData.queryId))
-        setVoiceLoading(true)
-        const audioElement = document.getElementsByClassName('voiceReportPlayer')[0];
-        let attempt = 0;
-        function attemptPlay() {
-          attempt++
-        // @ts-ignore
-          audioElement.src = url
+      sessionStorage.setItem('isInIframe', 'false')
+    }
+    // 监听来自父页面的消息
+    window.addEventListener('message', (event) => {
+      const closeAnimation = () => {
+        const iconList = document.getElementsByClassName(`voice-icon`)
+        if (iconList.length > 0) {
+          // 有正在播放的,停止播放并且清除样式
           // @ts-ignore
-          audioElement.load();
-          // @ts-ignore
-          // @ts-ignore
-          audioElement.play().then(()=> {
-            // 播放成功，添加播放动效，停止loading效果
-            const voicingIcon = document.getElementsByClassName(`voice-icon-${msgData.queryId}`)[0];
-            voicingIcon?.classList?.add('voice-icon')
-            setVoiceLoading(false)
-            // @ts-ignore
-            audioElement.dataset.index = msgData.queryId
-            showTip.current && message.success('播放成功！！！');
-            // @ts-ignore
-            console.log('播放成功');
-          }).catch(e => {
-            // 播放失败，定时重试
-            console.error(`播放失败(尝试 ${attempt}/${(attempt < retries)}`)
-            showTip.current && message.error(`播放失败(尝试 ${attempt}/${(attempt < retries)}`)
-            setTimeout(attemptPlay, delay)
-            // 重试10次后也未能播放，触发执行
-            if (attempt >= retries) {
-              const iconList = document.getElementsByClassName(`voice-icon`)
-              iconList[0]?.classList.remove('voice-icon')
-              setVoiceLoading(false)
-              showTip.current && message.error('播放失败，获取文件异常,可重新点击播放');
-            }
+          // iconList[0]?.classList.remove('voice-icon')
+          Array.from(iconList).forEach(ele => {
+            ele.classList.remove('voice-icon')
           })
         }
-        audioElement.addEventListener('ended', closeAnimation, { once: true });
-        audioElement.addEventListener('timeupdate', function() {
-          // @ts-ignore
-          if (audioElement.currentTime === audioElement.duration) {
-            // 您可以在这里添加其他逻辑，例如更新进度条或显示剩余时间等。
-            const icon = document.getElementsByClassName(`voice-icon`)[0];
-            // const icon = document.getElementsByClassName(`voice-icon-${msgData.queryId}`)[0];
-            icon?.classList?.remove('voice-icon')
-          }
-        }, { once: true })
-        // @ts-ignore
-        audioElement.addEventListener('loadedmetadata', () => {
-          // 音频时长（秒）
-          // @ts-ignore
-          const duration = audioElement.duration;
-          console.log('音频时长:', duration, '秒');
-          showTip.current && message.success('音频时长:' + duration + '秒');
-        }, { once: true });
-        // attemptPlay();
-
-        function playDynamicAudio() {
-          const audioElement = document.getElementsByClassName('voiceReportPlayer')[0] || new Audio();
-          // 先暂停并重置
-          // @ts-ignore
-          audioElement.pause();
-          // @ts-ignore
-          audioElement.currentTime = 0;
-          
-          // 重要：先移除事件监听器，避免内存泄漏
-          // @ts-ignore
-          audioElement.onerror = null;
-          // @ts-ignore
-          audioElement.onended = null;
-          
-          // 重置src前先设置为空
-          // @ts-ignore
-          audioElement.src = '';
-          // @ts-ignore
-          audioElement.load(); // 强制清空
-          
-          // 设置新src
-          // @ts-ignore
-          audioElement.src = msgData.ttsUrl.replace('dc.migu.cn', 'da.migu.cn:8443')
-          
-          // 添加错误处理
-          // @ts-ignore
-          audioElement.onerror = () => console.error('音频加载失败');
-          
-          // @ts-ignore
-          audioElement.play().then(() =>{
-            // 播放成功，添加播放动效，停止loading效果
-            const voicingIcon = document.getElementsByClassName(`voice-icon-${msgData.queryId}`)[0];
-            voicingIcon?.classList?.add('voice-icon')
-            setVoiceLoading(false)
-            // @ts-ignore
-            audioElement.dataset.index = msgData.queryId
-            showTip.current && message.success('播放成功！！！');
-          }).catch(e => {
-            console.error('播放被阻止:', e);
-            // 可能需要用户交互
-            attemptPlay()
-          });
-        }
-        playDynamicAudio()
       }
-      // playAudio(msgData.ttsUrl.replace('dc.migu.cn', 'da.migu.cn:8443'))
-
-      const oaAccount = localStorage.getItem('oaAccount') || '';
-      const accountList = ['liqianqianjs', 'dmtest02']
-      if (accountList.includes(oaAccount) && false) {
-        const prefix = 'https://da.migu.cn:8443/elephant-screen/upload/video/tts/20250328/'
-        const url = `${prefix}${sessionStorage.getItem('voiceReportId')}.wav`
-        // @ts-ignore
-        const vId = sessionStorage.getItem('voiceReportId') || 0
-        let voiceId = (+(vId) || 0) + 1
-        sessionStorage.setItem('voiceReportId', `${voiceId % 10}`)
-        const load = function(){
-          // @ts-ignore
-          audioElementCur[0].src = url
-          // @ts-ignore
-          audioElementCur[0].load();
-        }
-        sessionStorage.setItem('voiceReportQueryId', JSON.stringify(msgData.queryId))
-        setVoiceLoading(true)
-        
-        audioElementCur[0].addEventListener('ended', () => {
-          const voicingIcon = document.getElementsByClassName(`voice-icon-${msgData.queryId}`)[0];
-          const audioElement = document.getElementsByClassName('voiceReportPlayer')[0];
-          voicingIcon?.classList?.remove('voice-icon')
-          // @ts-ignore
-          audioElement.dataset.index = ''
-        }, { once: true });
-        audioElementCur[0].addEventListener('timeupdate', function() {
-          // @ts-ignore
-          if (audioElementCur[0].currentTime === audioElementCur[0].duration) {
-            // 您可以在这里添加其他逻辑，例如更新进度条或显示剩余时间等。
-            const icon = document.getElementsByClassName(`voice-icon`)[0];
-            // const icon = document.getElementsByClassName(`voice-icon-${msgData.queryId}`)[0];
-            icon?.classList?.remove('voice-icon')
-          }
-        }, { once: true })
-        // load()
-        // setTimeout(() => {load()}, 2000)
-        // setTimeout(() => {load()}, 4000)
-        // setTimeout(() => {load()}, 6000)
-        // setTimeout(() => {load()}, 8000)
-        // setTimeout(() => {load()}, 10000)
-        // setTimeout(() => {load()}, 12000)
-        load();
-        setTimeout(() => {
-          // @ts-ignore
-          audioElementCur[0].play();
-          const voicingIcon = document.getElementsByClassName(`voice-icon-${msgData.queryId}`)[0];
-          voicingIcon?.classList?.add('voice-icon')
-          setVoiceLoading(false)
-          // @ts-ignore
-          audioElementCur[0].dataset.index = msgData.queryId
-        }, 100)
-      } else {
-        playAudio(msgData.ttsUrl.replace('dc.migu.cn', 'da.migu.cn:8443'))
+      // 处理消息
+      if (event.data.action === 'voicePause') {
+        closeAnimation()
       }
-    }
-  }
+      // 处理消息
+      if (event.data.action === 'iframeHidden') {
+        closeAnimation()
+      }
+    });
+  }, []);
 
   const messageContainerClass = classNames(styles.messageContainer, { [styles.mobile]: isMobile });
   return (
@@ -337,14 +158,10 @@ const MessageContainer: React.FC<Props> = ({
                     onMsgDataLoaded={(data: MsgDataType, valid: boolean, isRefresh) => {
                       onMsgDataLoaded(data, msgId, msgValue || msg || '', valid, isRefresh);
                     }}
-                    onVoiceReport={(msgData: any) => {
-                      voiceReport(msgData)
-                    }}
                     onUpdateMessageScroll={updateMessageContainerScroll}
                     onSendMsg={onSendMsg}
                     onCouldNotAnswer={onCouldNotAnswer}
                     isLastMessage={index === messageList.length - 1}
-                    curItemIndex={index}
                   />
                 </>
               )}
@@ -352,7 +169,7 @@ const MessageContainer: React.FC<Props> = ({
           );
         })}
       </div>
-      <audio className={`voiceReportPlayer`} style={{ width: 0, height: 0, position: 'absolute'}}></audio>
+      {/* <audio preload="auto" className={`voiceReportPlayerCache`} style={{ width: 0, height: 0, position: 'absolute'}}></audio> */}
     </div>
   );
 };

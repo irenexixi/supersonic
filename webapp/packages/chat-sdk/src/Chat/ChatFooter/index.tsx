@@ -251,12 +251,12 @@ const ChatFooter: ForwardRefRenderFunction<any, Props> = (
         })
       }, 20)
   }
-  const resizeIframe = () => {
-    window.addEventListener('resize', function() {
-      const newHeight = window.innerHeight;
-      window.parent.postMessage({ type: 'resize', height: newHeight}, '*')
-    })
-  }
+  // const resizeIframe = () => {
+  //   window.addEventListener('resize', function() {
+  //     const newHeight = window.innerHeight;
+  //     window.parent.postMessage({ type: 'resize', height: newHeight}, '*')
+  //   })
+  // }
 
   // const autoCompleteDropdownClass = classNames(styles.autoCompleteDropdown, {
   //   [styles.mobile]: isMobile,
@@ -375,6 +375,9 @@ const ChatFooter: ForwardRefRenderFunction<any, Props> = (
               message.info('请等待上个问题回答完毕');
             } else {
               onAddConversation();
+              const player = document.getElementsByClassName('voiceReportPlayer')[0]
+              // @ts-ignore
+              player && player.pause()
             }
           }}
         >
@@ -404,7 +407,8 @@ const ChatFooter: ForwardRefRenderFunction<any, Props> = (
         <div
           style={{ display: showVoice ? 'none' : 'none' }}
           className={styles.swtichInput}
-          onClick={() => {setShowVoice(!showVoice); resizeIframe()}}>
+          // onClick={() => {setShowVoice(!showVoice); resizeIframe()}}>
+          onClick={() => {setShowVoice(!showVoice);}}>
           {/* <IconFont type="icon-zhinengzhuli" className={styles.toolIcon} /> */}
           {/* <WifiOutlined className={styles.toolIcon} style={{transform: 'rotate(90deg)'}}/> */}
           <Image
@@ -486,7 +490,8 @@ const ChatFooter: ForwardRefRenderFunction<any, Props> = (
       <div style={{ display: showVoice ? 'none' : 'none' }} className={styles.composer}>
         <div
           className={styles.swtichInput}
-          onClick={() => {setShowVoice(!showVoice);resizeIframe()}}>
+          // onClick={() => {setShowVoice(!showVoice);resizeIframe()}}>
+          onClick={() => {setShowVoice(!showVoice);}}>
           {/* <IconFont type="icon-ios-send" className={styles.toolIcon} /> */}
           {/* <EditOutlined className={styles.toolIcon} /> */}
           <Image
@@ -499,7 +504,7 @@ const ChatFooter: ForwardRefRenderFunction<any, Props> = (
         </div>
         <div className={styles.composerInputWrapper}>
           <div className={styles.voiceInput}>
-            <VoiceInput onCallback={ voiceAutoSend }></VoiceInput>
+            {/* <VoiceInput onCallback={ voiceAutoSend }></VoiceInput> */}
           </div>
         </div>
       </div>

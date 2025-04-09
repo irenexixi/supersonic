@@ -12,7 +12,7 @@ import { Button } from 'antd';
 import { CLS_PREFIX } from '../../common/constants';
 import { useContext, useEffect, useState, useRef } from 'react';
 import classNames from 'classnames';
-import { updateQAFeedback, voiceTts } from '../../service';
+import { updateQAFeedback } from '../../service';
 import { useMethodRegister } from '../../hooks';
 import { ChartItemContext } from '../ChatItem';
 
@@ -66,17 +66,123 @@ const Tools: React.FC<Props> = ({
 
   const { call } = useContext(ChartItemContext);
   
-  useEffect(() => {
-    // 当data变化时，这个函数会被调用
-    // handleDataChange(data);
-    setExportLoading(voiceLoading);
-  }, [voiceLoading]);
+  // useEffect(() => {
+  //   // 当data变化时，这个函数会被调用
+  //   // handleDataChange(data);
+  //   setExportLoading(voiceLoading);
+  // }, [voiceLoading]);
 
-  // 改造为只有1个audio标签,点击播放就播放,在次点击就停止.
+  useEffect(() => {
+    // const wavId = sessionStorage.getItem('voiceReportId')
+    // if (!wavId) {
+    //   sessionStorage.setItem('voiceReportId', '1')
+    // }
+    const isIOS = window.navigator.userAgent.match(/(iPhone|iPod|ios)/i);
+    if (msgData?.ttsUrl && !isIOS) {
+      setExportLoading(true)
+      // @ts-ignore
+      // const vId = sessionStorage.getItem('voiceReportId') || 0
+      // const length = msgData?.textSummary?.length || 0
+      // 字数时间补偿,文本越长,补偿时间越多,loading的时间就越多
+      setTimeout(() => {
+        // @ts-ignore
+        setExportLoading(false)
+      }, 500)
+    }
+  }, [msgData?.ttsUrl]);
+
+  // const showTip = useRef(false)
+  // useEffect(() => {
+  //   // sessionStorage.setItem('loadVoiceData', 'true')
+  //   // 当data变化时，这个函数会被调用
+  //   // const oaAccount = localStorage.getItem('oaAccount');
+  //   // const accountList = ['liqianqianjs', 'liqianqian', 'jiangjiqi', 'jiangjiqipt', 'liaokun', 'liaokun_pt', 'zhouzhou_pt', 'zhouzhou']
+  //   // // @ts-ignore
+  //   // if (accountList.indexOf(oaAccount) > -1) {
+  //   //   showTip.current = true
+  //   // }
+  //   // // 全部打开弹窗,部署在redred环境,不影响正式环境的功能
+  //   // showTip.current = true
+  // }, []);
+  
+  
+  // 从Tools中触发点击事件传递到ChatItem在从ChatItem中触发MessageContainer的voiceReport函数
   const voiceReport = (msgData: any = {}) => {
-    // 调用父组件的语音播报
-    if (onVoiceReport) {
-      onVoiceReport?.(msgData);
+    // @ts-ignore
+    const playAnimation = () => {
+      const iconList = document.getElementsByClassName(`voice-icon`)
+      if (iconList.length > 0) {
+        Array.from(iconList).forEach(element => {
+          element.classList.remove('voice-icon')
+        })
+      }
+      // 播放成功，添加播放动效，停止loading效果
+      const vIcon = document.getElementsByClassName(`voice-icon-${msgData.queryId}`)[0];
+      vIcon?.classList?.add('voice-icon')
+    }
+    if (sessionStorage.getItem('isInIframe') === 'true') {
+      // 从iframe中引用访问，播报使用parent内audio
+      // 点击播放按钮，触发语音播放
+      playAnimation()
+      window.parent.postMessage({ action: 'voicePlay', msgData }, '*');
+    } else {
+      let player = document.getElementsByClassName('voiceReportPlayer')[0]
+      if (player) {
+        // @ts-ignore
+        if (!player.paused && player.dataset.index === `${msgData.queryId}`) {
+          // @ts-ignore
+          player.pause()
+          const vIcon = document.getElementsByClassName('voice-icon')[0];
+          vIcon?.classList?.remove('voice-icon')
+          return
+        }
+        // @ts-ignore
+        player.src = msgData.ttsUrl.replace('dc.migu.cn', 'da.migu.cn:8443')
+        // @ts-ignore
+        player.play()
+        // @ts-ignore
+        player.dataset.index = `${msgData.queryId}`
+        playAnimation()
+      } else {
+        // 非iframe中引用访问，播报使用本项目内audio
+        const pageRoot = document.getElementById('root')
+        // 播放成功，添加播放动效，停止loading效果
+        player = new Audio(msgData.ttsUrl.replace('dc.migu.cn', 'da.migu.cn:8443'))
+        pageRoot?.appendChild(player)
+        // @ts-ignore
+        player.style.width = '0'
+        // @ts-ignore
+        player.style.height = '0'
+        // @ts-ignore
+        player.style.position = 'absolute'
+        player.classList.add('voiceReportPlayer')
+        // @ts-ignore
+        player.play()
+        // @ts-ignore
+        player.dataset.index = `${msgData.queryId}`
+        playAnimation()
+      }
+      player.addEventListener('ended', () => {
+        const vIcon = document.getElementsByClassName(`voice-icon-${msgData.queryId}`)[0];
+        const audioEle = document.getElementsByClassName('voiceReportPlayer')[0];
+        vIcon?.classList?.remove('voice-icon')
+        // @ts-ignore
+        audioEle.dataset.index = ''
+      }, { once: true });
+      player.addEventListener('timeupdate', function() {
+        // @ts-ignore
+        if (player.currentTime === player.duration) {
+          // 您可以在这里添加其他逻辑，例如更新进度条或显示剩余时间等。
+          const icon = document.getElementsByClassName(`voice-icon`)
+          // icon?.classList?.remove('voice-icon')
+          Array.from(icon).forEach(ele => {
+            ele.classList.remove('voice-icon')
+          })
+          const audioEle = document.getElementsByClassName('voiceReportPlayer')[0];
+          // @ts-ignore
+          audioEle.dataset.index = ''
+        }
+      }, { once: true })
     }
   }
 
@@ -95,17 +201,13 @@ const Tools: React.FC<Props> = ({
                   onClick={() => {
                     // setExportLoading(true);
                     voiceReport(msgData);
-                    // // onExportData?.();
-                    // setTimeout(() => {
-                    //   setExportLoading(false);
-                    // }, 3000);
                   }}
                   type="text"
-                  loading={`${msgData?.queryId}` === sessionStorage.getItem('voiceReportQueryId') ? exportLoading : false}
+                  loading={ exportLoading }
+                  // loading={`${msgData?.queryId}` === sessionStorage.getItem('voiceReportQueryId') ? exportLoading : false}
                 >
                   <SoundOutlined className={`voice-icon-${msgData.queryId} voice-icon-default`} />
                   {/* <span className={`${prefixCls}-font-style`}>语音播放</span> */}
-                  {/* <audio className={`voiceReportPlayer`} preload='auto' style={{ position: 'absolute', width: '0', height: '0' }}></audio> */}
                   <span className={`${prefixCls}-font-style`}></span>
                 </Button>
                 {!isMobile && (

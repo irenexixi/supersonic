@@ -47,7 +47,6 @@ type Props = {
   triggerResize?: boolean;
   isDeveloper?: boolean;
   curItemIndex?: number;
-  onVoiceReport?: (msgData: any) => void;
   itemVoiceLoading?: boolean;
   integrateSystem?: string;
   executeItemNode?: React.ReactNode;
@@ -83,7 +82,6 @@ const ChatItem: React.FC<Props> = ({
   isDeveloper,
   itemVoiceLoading,
   curItemIndex,
-  onVoiceReport,
   // integrateSystem,
   executeItemNode,
   renderCustomExecuteNode,
@@ -475,17 +473,7 @@ const ChatItem: React.FC<Props> = ({
   useEffect(() => {
     canSendMsgRef.current = globalState.canSendMsg;
   }, [globalState.canSendMsg]);
-
-  useEffect(() => {
-    if (`${msgData?.queryId}` === sessionStorage.getItem('voiceReportQueryId')) {
-      setVoiceLoading(itemVoiceLoading || false)
-    }
-  }, [itemVoiceLoading]);
-  const voiceReport = (msgData: any = {}) => {
-    if (onVoiceReport) {
-      onVoiceReport?.(msgData)
-    }
-  }
+  
   const onSwitchEntity = async (entityId: string) => {
     setEntitySwitchLoading(true);
     const res = await switchEntity(entityId, data?.chatContext?.modelId, conversationId || 0);
@@ -785,9 +773,6 @@ const ChatItem: React.FC<Props> = ({
             isSimpleMode={isSimpleMode}
             onReExecute={queryId => {
               deleteQueryInfo(queryId);
-            }}
-            onVoiceReport={(msgData: any) => {
-              voiceReport(msgData)
             }}
           />
         )}

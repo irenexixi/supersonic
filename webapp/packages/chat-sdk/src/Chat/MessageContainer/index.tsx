@@ -18,7 +18,6 @@ type Props = {
   currentAgent?: AgentType;
   chatVisible?: boolean;
   isDeveloper?: boolean;
-  curItemIndex?: number;
   integrateSystem?: string;
   isSimpleMode?: boolean;
   isDebugMode?: boolean;
@@ -41,7 +40,6 @@ const MessageContainer: React.FC<Props> = ({
   currentAgent,
   chatVisible,
   isDeveloper,
-  curItemIndex,
   integrateSystem,
   isSimpleMode,
   isDebugMode,
@@ -69,99 +67,43 @@ const MessageContainer: React.FC<Props> = ({
     onResize();
   }, [historyVisible, chatVisible]);
 
-  
-  useEffect(() => {
-    const audioDom1 = document.getElementsByClassName('voiceReportPlayer')[0];
-  }, []); // 空数组作为依赖项，表示这个effect只在组件挂载和卸载时执行一次
+  // useEffect(() => {
+  //   // 当data变化时，这个函数会被调用
+  //   setVoiceLoading(voiceLoading);
+  // }, [voiceLoading]);
 
   useEffect(() => {
-    // 当data变化时，这个函数会被调用
-    setVoiceLoading(voiceLoading);
-  }, [voiceLoading]);
-
-  const showTip = useRef(false)
-  useEffect(() => {
-    // 当data变化时，这个函数会被调用
-    const oaAccount = localStorage.getItem('oaAccount');
-    const accountList = ['liqianqianjs', 'liqianqian', 'jiangjiqi', 'jiangjiqipt', 'liaokun', 'liaokun_pt']
-    // @ts-ignore
-    if (accountList.indexOf(oaAccount) > -1) {
-      showTip.current = true
-    }
-  }, []);
-  
-
-  // 从Tools中触发点击事件传递到ChatItem在从ChatItem中触发MessageContainer的voiceReport函数
-  const voiceReport = (msgData: any = {}) => {
-    console.clear()
-    const iconList = document.getElementsByClassName(`voice-icon`)
-    const audioElementCur = document.getElementsByClassName('voiceReportPlayer');
-    if (iconList.length > 0) {
-      // 有正在播放的,停止播放并且清除样式
-      // @ts-ignore
-      audioElementCur[0].pause()
-      iconList[0]?.classList.remove('voice-icon')
-      // @ts-ignore
-      if (audioElementCur[0].dataset.index === `${msgData.queryId}`) {
-        setTimeout(() => {
-          setVoiceLoading(false)
-        }, 100)
-      } else {
-        // 如果当前播放和点击的不是同一个，那就播放当前点击的
-        voiceReport(msgData)
-      }
+    // 如果在iframe中，调用语音播放就用父页面的postMessage触发audio的播放,否则用当前项目内的audio播放
+    // 这样做是因为咪咕家访问红海系统内iframe引入的红海经分小助手（chatBI）时，播放音频有兼容性问题。
+    if (window.self !== window.top) {
+      sessionStorage.setItem('isInIframe', 'false')
+      // sessionStorage.setItem('isInIframe', 'true')
     } else {
-      const closeAnimation = function() {
-        const voicingIcon = document.getElementsByClassName(`voice-icon-${msgData.queryId}`)[0];
-        const audioElement = document.getElementsByClassName('voiceReportPlayer')[0];
-        voicingIcon?.classList?.remove('voice-icon')
-        // @ts-ignore
-        audioElement.dataset.index = ''
-      }
-      const playAudio = function(url, retries = 10, delay = 3000) {
-        // 调用播放功能，设置loading和当前播放ID
-        sessionStorage.setItem('voiceReportQueryId', JSON.stringify(msgData.queryId))
-        setVoiceLoading(true)
-        const audioElement = document.getElementsByClassName('voiceReportPlayer')[0];
-        let attempt = 0;
-        function attemptPlay() {
-          attempt++
-        // @ts-ignore
-          audioElement.src = url
-          // @ts-ignore
-          audioElement.load();
-          // @ts-ignore
-          // @ts-ignore
-          audioElement.play().then(()=> {
-            // 播放成功，添加播放动效，停止loading效果
-            const voicingIcon = document.getElementsByClassName(`voice-icon-${msgData.queryId}`)[0];
-            voicingIcon?.classList?.add('voice-icon')
-            setVoiceLoading(false)
-            // @ts-ignore
-            audioElement.dataset.index = msgData.queryId
-            showTip.current && message.success('播放成功！！！');
-            // @ts-ignore
-            console.log('播放成功');
-          }).catch(e => {
-            // 播放失败，定时重试
-            console.error(`播放失败(尝试 ${attempt}/${(attempt < retries)}`)
-            showTip.current && message.error(`播放失败(尝试 ${attempt}/${(attempt < retries)}`)
-            setTimeout(attemptPlay, delay)
-            // 重试10次后也未能播放，触发执行
-            if (attempt >= retries) {
-              const iconList = document.getElementsByClassName(`voice-icon`)
-              iconList[0]?.classList.remove('voice-icon')
-              setVoiceLoading(false)
-              showTip.current && message.error('播放失败，获取文件异常,可重新点击播放');
-            }
-          })
-          audioElement.addEventListener('ended', closeAnimation, { once: true });
-        }
-        attemptPlay();
-      }
-      playAudio(msgData.ttsUrl.replace('dc.migu.cn', 'da.migu.cn:8443'))
+      sessionStorage.setItem('isInIframe', 'false')
     }
-  }
+    // 监听来自父页面的消息
+    window.addEventListener('message', (event) => {
+      const closeAnimation = () => {
+        const iconList = document.getElementsByClassName(`voice-icon`)
+        if (iconList.length > 0) {
+          // 有正在播放的,停止播放并且清除样式
+          // @ts-ignore
+          // iconList[0]?.classList.remove('voice-icon')
+          Array.from(iconList).forEach(ele => {
+            ele.classList.remove('voice-icon')
+          })
+        }
+      }
+      // 处理消息
+      if (event.data.action === 'voicePause') {
+        closeAnimation()
+      }
+      // 处理消息
+      if (event.data.action === 'iframeHidden') {
+        closeAnimation()
+      }
+    });
+  }, []);
 
   const messageContainerClass = classNames(styles.messageContainer, { [styles.mobile]: isMobile });
   return (
@@ -216,14 +158,10 @@ const MessageContainer: React.FC<Props> = ({
                     onMsgDataLoaded={(data: MsgDataType, valid: boolean, isRefresh) => {
                       onMsgDataLoaded(data, msgId, msgValue || msg || '', valid, isRefresh);
                     }}
-                    onVoiceReport={(msgData: any) => {
-                      voiceReport(msgData)
-                    }}
                     onUpdateMessageScroll={updateMessageContainerScroll}
                     onSendMsg={onSendMsg}
                     onCouldNotAnswer={onCouldNotAnswer}
                     isLastMessage={index === messageList.length - 1}
-                    curItemIndex={index}
                   />
                 </>
               )}
@@ -231,7 +169,7 @@ const MessageContainer: React.FC<Props> = ({
           );
         })}
       </div>
-      <audio className={`voiceReportPlayer`} style={{ width: 0, height: 0, position: 'absolute'}}></audio>
+      {/* <audio preload="auto" className={`voiceReportPlayerCache`} style={{ width: 0, height: 0, position: 'absolute'}}></audio> */}
     </div>
   );
 };

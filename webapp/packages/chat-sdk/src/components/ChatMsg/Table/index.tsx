@@ -60,7 +60,7 @@ const Table: React.FC<Props> = ({ data, size, loading, question, onApplyAuth }) 
         sorter:
           showType === 'NUMBER'
             ? (a, b) => {
-                return a[bizName] - b[bizName];
+                return parseFloat(a[bizName]) - parseFloat(b[bizName]);
               }
             : undefined,
         render: (value: string | number) => {
@@ -104,7 +104,7 @@ const Table: React.FC<Props> = ({ data, size, loading, question, onApplyAuth }) 
       };
     }
   );
-
+  console.log(tableColumns, 'talbeColumns')
   const getRowClassName = (_: any, index: number) => {
     return index % 2 !== 0 ? `${prefixCls}-even-row` : '';
   };
